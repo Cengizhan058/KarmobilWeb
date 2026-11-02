@@ -267,6 +267,9 @@ export const api = {
     istek<{ id: number; mesaj: string }>(id ? `/api/yonetim/gruplar/${id}` : '/api/yonetim/gruplar', { method: id ? 'PUT' : 'POST', body: JSON.stringify(g) }),
   grupSil: (id: number) => istek<{ mesaj: string }>(`/api/yonetim/gruplar/${id}`, { method: 'DELETE' }),
   arizaliAraclar: () => istek<ArizaliArac[]>('/api/yonetim/arizali-araclar'),
+  aktifBildirimler: () => istek<Record<string, unknown>[]>('/api/yonetim/aktif-bildirimler'),
+  programTablosu: () => istek<Record<string, unknown>[]>('/api/yonetim/program-tablosu'),
+  blokeliAraclar: () => istek<Record<string, unknown>[]>('/api/yonetim/blokeli-araclar'),
   // Ayarlar: ruhsat, mesai saatleri, RF-ID kartları
   ruhsatAlanlari: () => istek<{ ad: string; baslik: string; uz: number }[]>('/api/ayarlar/ruhsat-alanlari'),
   ruhsat: (id: number) => istek<{ plaka: string | null; alanlar: Record<string, string> }>(`/api/ayarlar/ruhsat/${id}`),

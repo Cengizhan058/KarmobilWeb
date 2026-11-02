@@ -42,6 +42,8 @@ public sealed class RaporIstegi
 {
     public required OturumKullanici Kullanici { get; init; }
     public required IReadOnlyList<RaporAraci> Araclar { get; init; }
+    /// <summary>Kullanıcı araç seçmeden "tümü" istedi (çoklu raporlarda); bazı yordamlar bunu 'all' ile alır.</summary>
+    public bool TumAraclar { get; init; }
     public DateTime? Baslangic { get; init; }
     public DateTime? Bitis { get; init; }
     /// <summary>Ay seçimli raporlarda ayın ilk günü.</summary>

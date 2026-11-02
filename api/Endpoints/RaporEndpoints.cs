@@ -27,6 +27,7 @@ public static class RaporEndpoints
     {
         ["alarmTurleri"] = "SELECT RAPORKODU AS DEGER, RAPORADI AS AD FROM raportanim WITH (NOLOCK) ORDER BY RAPORADI",
         ["suruculer"] = "SELECT KIMLIKID AS DEGER, ADSOYAD AS AD FROM surucukimlik WITH (NOLOCK) WHERE USERID = @kullaniciId ORDER BY ADSOYAD",
+        ["komutKodlari"] = "SELECT KOMUT AS DEGER, ACIKLAMA AS AD FROM cihazkomutkod WITH (NOLOCK) ORDER BY ACIKLAMA",
         ["canbusGirisleri"] = "SELECT KOMUT AS DEGER, TITLE AS AD FROM canbusinputs WITH (NOLOCK) ORDER BY TITLE",
         ["bolgeler"] = "SELECT ID AS DEGER, REGION_NAME AS AD FROM regions WITH (NOLOCK) WHERE USERID = @kullaniciId ORDER BY REGION_NAME",
         ["gruplar"] = "SELECT ID AS DEGER, GROUPNAME AS AD FROM groups WITH (NOLOCK) WHERE USERID = @kullaniciId ORDER BY GROUPNAME",
@@ -110,7 +111,7 @@ public static class RaporEndpoints
 
             var sonuc = await rapor.CalistirAsync(new RaporIstegi
             {
-                Kullanici = k, Araclar = araclar, Baslangic = bas, Bitis = bit, Ay = ay, Ekstra = ekstra,
+                Kullanici = k, Araclar = araclar, TumAraclar = istenen.Count == 0 && rapor.Arac == AracSecimi.Cok, Baslangic = bas, Bitis = bit, Ay = ay, Ekstra = ekstra,
             }, db, ct);
 
             return Results.Ok(new { kod = rapor.Kod, baslik = rapor.Baslik, sonuc.Kolonlar, sonuc.Satirlar, sonuc.Ozet });

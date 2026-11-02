@@ -119,6 +119,41 @@ public static class YonetimEndpoints
         ORDER BY c.PLAKA
         """;
 
+    // Aktif bildirimler: eski _getAlarmTable.asp (cihazalarm NUM1 > 0). Bölge alarmında (BA) NUM1 1 giriş, 2 çıkış, 3 ikisi; NUM2 bölge kimliği.
+    private const string AktifBildirimler = """
+        SELECT a.ID, c.PLAKA, a.KOMUT, a.NUM1, a.STR1, a.STR2, r.RAPORADI, b.REGION_NAME
+        FROM cihazalarm a WITH (NOLOCK)
+        JOIN clients c WITH (NOLOCK) ON c.CIHAZID = a.CIHAZID AND c.STATUS = 1
+        JOIN userclients u WITH (NOLOCK) ON u.CLIENTID = c.ID AND u.USERID = @kullaniciId
+        LEFT JOIN raportanim r WITH (NOLOCK) ON r.RAPORKODU = a.KOMUT
+        LEFT JOIN regions b WITH (NOLOCK) ON a.KOMUT = 'BA' AND b.ID = a.NUM2
+        WHERE a.NUM1 > 0
+        ORDER BY c.PLAKA, r.RAPORADI
+        """;
+
+    // Mevcut program tablosu: eski _getClientsProgramTable.asp. Her komut için cihazkomut'taki son kayıt;
+    // kayıt yoksa "varsayılan", NUM1 0 kapalı, 1 açık (değer PZ/PM/PH için NUM2, PD için NUM4).
+    private const string ProgramTablosu = """
+        SELECT c.ID, c.PLAKA, c.CONNTYPE,
+               pz.NUM1 AS PZ1, pz.NUM2 AS PZ, pd.NUM1 AS PD1, pd.NUM4 AS PD, pm.NUM1 AS PM1, pm.NUM2 AS PM, ph.NUM1 AS PH1, ph.NUM2 AS PH
+        FROM clients c WITH (NOLOCK)
+        JOIN userclients u WITH (NOLOCK) ON u.CLIENTID = c.ID AND u.USERID = @kullaniciId
+        OUTER APPLY (SELECT TOP 1 NUM1, NUM2 FROM cihazkomut WITH (NOLOCK) WHERE CIHAZID = c.CIHAZID AND KOMUT = 'PZ') pz
+        OUTER APPLY (SELECT TOP 1 NUM1, NUM4 FROM cihazkomut WITH (NOLOCK) WHERE CIHAZID = c.CIHAZID AND KOMUT = 'PD') pd
+        OUTER APPLY (SELECT TOP 1 NUM1, NUM2 FROM cihazkomut WITH (NOLOCK) WHERE CIHAZID = c.CIHAZID AND KOMUT = 'PM') pm
+        OUTER APPLY (SELECT TOP 1 NUM1, NUM2 FROM cihazkomut WITH (NOLOCK) WHERE CIHAZID = c.CIHAZID AND KOMUT = 'PH') ph
+        WHERE c.STATUS = 1
+        ORDER BY c.PLAKA
+        """;
+
+    // Motor blokesi aktif araçlar: eski _getClientsBlokeliAraclar.asp (clients.MOTOR = 1).
+    private const string BlokeliAraclar = """
+        SELECT c.ID, c.CIHAZID, c.GSM, c.PLAKA
+        FROM clients c WITH (NOLOCK) JOIN userclients u WITH (NOLOCK) ON u.CLIENTID = c.ID AND u.USERID = @kullaniciId
+        WHERE c.STATUS = 1 AND c.MOTOR = 1
+        ORDER BY c.PLAKA
+        """;
+
     public sealed record AracIstegi(
         string? Plaka, string? AracSahibi, string? AracCinsi, string? AracMarkasi, string? AracTipi, string? Surucu, string? Aciklama,
         int Ikon, DateTime? Muayene1, DateTime? Muayene2, DateTime? Sigorta1, DateTime? Sigorta2, DateTime? Kasko1, DateTime? Kasko2,
@@ -130,6 +165,55 @@ public static class YonetimEndpoints
     public static void MapYonetim(this IEndpointRouteBuilder app)
     {
         var g = app.MapGroup("/api/yonetim").WithTags("Yönetim").RequireAuthorization();
+
+        // ---- Salt okunur listeler (Ayarlar menüsü) ----
+        g.MapGet("/aktif-bildirimler", (HttpContext h, OturumServisi o, SqlDb db, CancellationToken ct) => Kullanici(h, o, ct, async k =>
+            Results.Ok((await db.SorguAsync(AktifBildirimler, P(k), ct)).Select(s =>
+            {
+                var komut = Metin(s["KOMUT"]);
+                var num1 = Ondalik(s["NUM1"]);
+                var durum = komut != "BA" ? "" : (num1 switch { 1 => "Giriş: ", 2 => "Çıkış: ", 3 => "Giriş ve çıkış: ", _ => "" }) + (Metin(s["REGION_NAME"]) ?? "");
+                return new
+                {
+                    id = Convert.ToInt32(s["ID"]),
+                    plaka = Metin(s["PLAKA"]),
+                    alarm = Metin(s["RAPORADI"]) ?? komut,
+                    durum,
+                    // Eski görünüm: STR1/STR2 saat (ör. "8" → "08:00").
+                    saatAraligi = $"{Saat(s["STR1"])} - {Saat(s["STR2"])}",
+                };
+            }))));
+
+        g.MapGet("/program-tablosu", (HttpContext h, OturumServisi o, SqlDb db, CancellationToken ct) => Kullanici(h, o, ct, async k =>
+        {
+            if (!k.CihazProgramlama) return Yasak();
+            static string Durum(object? acik, object? deger) => Ondalik(acik) switch
+            {
+                null or -1 => "Varsayılan",
+                0 => "Kapalı",
+                1 => Ondalik(deger)?.ToString(CultureInfo.InvariantCulture) ?? "",
+                _ => "Programlanmamış",
+            };
+            return Results.Ok((await db.SorguAsync(ProgramTablosu, P(k), ct)).Select(s => new
+            {
+                id = Convert.ToInt32(s["ID"]),
+                plaka = Metin(s["PLAKA"]),
+                hareketliSn = Durum(s["PZ1"], s["PZ"]),
+                dururkenSn = Durum(s["PD1"], s["PD"]),
+                mesafeKm = Durum(s["PM1"], s["PM"]),
+                hizLimiti = Durum(s["PH1"], s["PH"]),
+                baglanti = Metin(s["CONNTYPE"]),
+            }));
+        }));
+
+        g.MapGet("/blokeli-araclar", (HttpContext h, OturumServisi o, SqlDb db, CancellationToken ct) => Kullanici(h, o, ct, async k =>
+        {
+            if (!k.CihazProgramlama) return Yasak();
+            return Results.Ok((await db.SorguAsync(BlokeliAraclar, P(k), ct)).Select(s => new
+            {
+                id = Convert.ToInt32(s["ID"]), cihazId = Metin(s["CIHAZID"]), gsm = Metin(s["GSM"]), plaka = Metin(s["PLAKA"]),
+            }));
+        }));
 
         g.MapGet("/arac-ikonlari", async (SqlDb db, CancellationToken ct) =>
             Results.Ok((await db.SorguAsync(Ikonlar, null, ct)).Select(s => new { no = Convert.ToInt32(s["ICONNO"]), ad = RaporYardimci.Metin(s["ICONNAME"]) })));
@@ -286,5 +370,6 @@ public static class YonetimEndpoints
     private static string Kes(string? s, int uz) { var t = (s ?? "").Trim(); return t.Length > uz ? t[..uz] : t; }
     private static string B(bool b) => b ? "1" : "0";
     private static bool Isaret(object? v) => (v?.ToString() ?? "").Trim() == "1";
+    private static string Saat(object? v) => (v?.ToString() ?? "").Trim() is { Length: > 0 } s && s != "-" ? (s.Contains(':') ? s : s.PadLeft(2, '0') + ":00") : "--:--";
     private static string? Gun(object? v) => v is DateTime d && d.Year > 1900 ? d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : null;
 }
