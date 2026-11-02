@@ -22,7 +22,13 @@ export type OturumKullanici = {
   akilliBlokaj: boolean
   haritaSiniri: HaritaSiniri | null
   tema: string | null
+  /** 0 plaka, 1 cihaz ID, 2 sürücü, 3 hız (users.GORUNUM) */
+  etiket: number
+  araclariGrupla: boolean
+  arizalilariGizle: boolean
 }
+
+export type GorunumAyari = Partial<Pick<OturumKullanici, 'etiket' | 'araclariGrupla' | 'arizalilariGizle'>>
 
 export type Bayi = {
   bid: string
@@ -50,8 +56,12 @@ export type AracKonum = {
   surucu: string | null
   gpsTarihi: string | null
   sinyalTarihi: string | null
+  /** Son sinyalden bu yana geçen saat; 72 ve üstü eski sitede 'arızalı' sayılır. */
+  sinyalYasiSaat: number | null
   adres: string | null
   cihazTipi: string | null
+  /** 0 araç, 1 kişi */
+  cihazTuru: number
   grupIdleri: number[]
   dvr: boolean
   motorBlokeli: boolean
@@ -140,6 +150,7 @@ async function istek<T>(yol: string, secenek: RequestInit = {}): Promise<T> {
     throw new ApiHatasi(mesaj, yanit.status, kod)
   }
 
+  if (yanit.status === 204) return undefined as T
   return (await yanit.json()) as T
 }
 
@@ -150,6 +161,7 @@ export const api = {
   bayi: () => istek<Bayi>('/api/bayi'),
   araclar: (grupId?: number | null) => istek<AracKonum[]>('/api/araclar' + (grupId ? `?grupId=${grupId}` : '')),
   gruplar: () => istek<Grup[]>('/api/gruplar'),
+  gorunumKaydet: (ayar: GorunumAyari) => istek<void>('/api/ayarlar/gorunum', { method: 'PUT', body: JSON.stringify(ayar) }),
   aracDetay: (id: number) => istek<AracDetay>(`/api/araclar/${id}/detay`),
   // Gerçek cihaza komut gönderir (cihazkomut tablosuna SK yazılır).
   anlikKonumIste: (id: number) => istek<{ mesaj: string }>(`/api/araclar/${id}/anlik-konum`, { method: 'POST' }),

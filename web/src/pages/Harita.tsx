@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { MapContainer, Marker, TileLayer, ZoomControl, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, ZoomControl, useMap } from 'react-leaflet'
 import { PanelLeftOpen } from 'lucide-react'
-import L, { type LatLngBoundsExpression } from 'leaflet'
+import type { LatLngBoundsExpression } from 'leaflet'
 import { api, type AracDurumu, type AracKonum, type Grup } from '../api/client.ts'
 import { useKullanici } from '../components/Duzen.tsx'
+import AracKatmani from '../components/AracKatmani.tsx'
 import AracListesi from '../components/AracListesi.tsx'
 import AracBilgiPaneli from '../components/AracBilgiPaneli.tsx'
-import { DURUMLAR } from '../lib/arac.ts'
 
 // Eski sitedeki Google katmanlarıyla aynı (index.asp tMapInit).
 const KATMANLAR = {
@@ -20,20 +20,10 @@ type KatmanId = keyof typeof KATMANLAR
 // Türkiye geneli; kullanıcının users.MAPX/MAPY sınırı varsa o kullanılır.
 const VARSAYILAN_SINIR: LatLngBoundsExpression = [[35.8, 25.6], [42.2, 44.9]]
 const YENILEME_MS = 10_000
+// Eski sitedeki 'arızalı' sınırı: son sinyal 72 saatten eskiyse (main.js applyFilters gsmfark>=72).
+const ARIZALI_SAAT = 72
 
-function aracIkonu(a: AracKonum, secili: boolean) {
-  const renk = DURUMLAR[a.durum].renk
-  // Hareketli araçta yön oku, diğerlerinde nokta.
-  const isaret = a.durum === 'Hareketli'
-    ? `<svg viewBox="0 0 24 24" width="16" height="16" style="transform:rotate(${a.yon}deg)"><path d="M12 2 L20 21 L12 16 L4 21 Z" fill="#fff"/></svg>`
-    : '<span class="ic-nokta"></span>'
-  return L.divIcon({
-    className: 'arac-isaret' + (secili ? ' secili' : ''),
-    html: `<div class="isaret-daire" style="background:${renk}">${isaret}</div><div class="isaret-plaka">${a.plaka}</div>`,
-    iconSize: [0, 0],
-    iconAnchor: [0, 0],
-  })
-}
+export type TurFiltre = 'hepsi' | 'arac' | 'kisi'
 
 function SinirAyarla({ araclar }: { araclar: AracKonum[] }) {
   const map = useMap()
@@ -95,6 +85,7 @@ export default function Harita() {
   const [takip, setTakip] = useState(false)
   const [listeAcik, setListeAcik] = useState(listeTercihi)
   const [yaklasIstegi, setYaklasIstegi] = useState(0)
+  const [turFiltre, setTurFiltre] = useState<TurFiltre>('hepsi')
 
   useEffect(() => { api.gruplar().then(setGruplar).catch(() => { /* grup yoksa seçim gizlenir */ }) }, [])
 
@@ -115,9 +106,16 @@ export default function Harita() {
     return () => { iptal = true; clearTimeout(zamanlayici) }
   }, [grupId])
 
+  // Liste ve harita aynı kapsamı gösterir: görünüm ayarı (arızalılar) + araç/kişi seçimi.
+  const kapsam = useMemo(() => araclar.filter(a =>
+    !(k.arizalilariGizle && (a.sinyalYasiSaat ?? 0) >= ARIZALI_SAAT) &&
+    (turFiltre === 'hepsi' || (turFiltre === 'kisi') === (a.cihazTuru === 1))),
+  [araclar, k.arizalilariGizle, turFiltre])
+  const kisiVar = araclar.some(a => a.cihazTuru === 1)
+
   const gorunen = useMemo(
-    () => araclar.filter(a => a.lat && a.lon && (durumFiltre.size === 0 || durumFiltre.has(a.durum))),
-    [araclar, durumFiltre])
+    () => kapsam.filter(a => a.lat && a.lon && (durumFiltre.size === 0 || durumFiltre.has(a.durum))),
+    [kapsam, durumFiltre])
 
   const secili = araclar.find(a => a.id === seciliId) ?? null
 
@@ -141,7 +139,10 @@ export default function Harita() {
   return (
     <div className={'harita-sayfa' + (listeAcik ? '' : ' liste-kapali')}>
       {listeAcik && <AracListesi
-        araclar={araclar}
+        araclar={kapsam}
+        kisiVar={kisiVar}
+        turFiltre={turFiltre}
+        onTur={setTurFiltre}
         gruplar={gruplar}
         grupId={grupId}
         onGrup={setGrupId}
@@ -159,21 +160,13 @@ export default function Harita() {
           <TileLayer key={katman} url={t.url} subdomains={[...t.sub]} maxZoom={20} attribution="Google" />
           <SinirAyarla araclar={araclar} />
           <SeciliyeGit arac={secili} istek={yaklasIstegi} takip={takip} />
-          {gorunen.map(a => (
-            <Marker
-              key={a.id}
-              position={[a.lat!, a.lon!]}
-              icon={aracIkonu(a, a.id === seciliId)}
-              zIndexOffset={a.id === seciliId ? 1000 : 0}
-              eventHandlers={{ click: () => sec(a) }}
-            />
-          ))}
+          <AracKatmani araclar={gorunen} grupla={k.araclariGrupla} etiket={k.etiket} seciliId={seciliId} onSec={sec} />
         </MapContainer>
 
         {!listeAcik && (
           <button className="liste-ac" onClick={() => listeyiAyarla(true)} title="Araç listesini göster">
             <PanelLeftOpen size={18} />
-            Araçlar <span className="sayi">{araclar.length}</span>
+            Araçlar <span className="sayi">{kapsam.length}</span>
           </button>
         )}
 

@@ -111,7 +111,24 @@ public static class AracEndpoints
                 : Results.BadRequest(new { error = "Cihaz şu an komut kabul etmiyor (bağlantı yok veya arızalı)." });
         });
 
-        grup.MapGet("/gruplar",async (HttpContext http, OturumServisi oturum, SqlDb db, CancellationToken ct) =>
+        // Görünüm tercihleri (Görünüm menüsü): eski sitedeki _setClientView.asp ve _prcSetOption.asp ile aynı alanlar.
+        grup.MapPut("/ayarlar/gorunum", async (GorunumIstegi istek, HttpContext http, OturumServisi oturum, SqlDb db, CancellationToken ct) =>
+        {
+            var k = await oturum.KullaniciAlAsync(http.User, ct);
+            if (k is null) return Results.Unauthorized();
+            if (istek.Etiket is < 0 or > 3) return Results.BadRequest(new { error = "Geçersiz etiket türü." });
+
+            await db.CalistirAsync(Sql.GorunumKaydet, new Dictionary<string, object?>
+            {
+                ["id"] = k.Id,
+                ["gorunum"] = istek.Etiket,
+                ["grupla"] = istek.AraclariGrupla is null ? null : istek.AraclariGrupla.Value ? 1 : 0,
+                ["arizaliGizle"] = istek.ArizalilariGizle is null ? null : istek.ArizalilariGizle.Value ? 1 : 0,
+            }, ct);
+            return Results.NoContent();
+        });
+
+        grup.MapGet("/gruplar", async (HttpContext http, OturumServisi oturum, SqlDb db, CancellationToken ct) =>
         {
             var k = await oturum.KullaniciAlAsync(http.User, ct);
             if (k is null) return Results.Unauthorized();
@@ -149,8 +166,11 @@ public static class AracEndpoints
             Surucu: BosIseNull(s["SURUCU"] as string),
             GpsTarihi: s["GPS_TARIH"] as DateTime?,
             SinyalTarihi: s["SINYAL_TARIH"] as DateTime?,
+            SinyalYasiSaat: s["SINYAL_YASI_SAAT"] is null ? null : Tam(s["SINYAL_YASI_SAAT"]),
             Adres: MetinTemizle(BosIseNull(s["ADRES"] as string)),
             CihazTipi: BosIseNull(s["CIHAZTIPI"] as string),
+            // DEVICE_TYPE: 0 araç, 1 kişi (eski filtre ağacındaki "Cihaz Türü").
+            CihazTuru: s["DEVICE_TYPE"] is null ? 0 : Tam(s["DEVICE_TYPE"]),
             GrupIdleri: GrupListesi(s["FILO_IDS"] as string),
             Dvr: !string.IsNullOrEmpty(dvr) && dvr != "1.1.1.1",
             MotorBlokeli: (s["MOTOR"]?.ToString() ?? "0").Trim() == "1",

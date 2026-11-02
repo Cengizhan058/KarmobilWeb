@@ -22,6 +22,11 @@ public sealed record OturumKullanici(
     int AltKullaniciLimiti,
     bool AkilliBlokaj,
     HaritaSiniri? HaritaSiniri,
-    string? Tema);
+    string? Tema,
+    // Görünüm tercihleri (users.GORUNUM / ARACLARIGRUPLA / KOPUKLARIFILTRE).
+    // Etiket: 0 plaka, 1 cihaz ID, 2 sürücü, 3 hız.
+    int Etiket,
+    bool AraclariGrupla,
+    bool ArizalilariGizle);
 
 public sealed record HaritaSiniri(double X1, double Y1, double X2, double Y2);

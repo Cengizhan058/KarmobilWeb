@@ -23,7 +23,8 @@ public static class Sql
                ISNULL(YP,0) AS YP, ISNULL(YH,0) AS YH, ISNULL(YC,0) AS YC,
                ISNULL(SUPERVISOR,0) AS SUPERVISOR, ISNULL(USERLIMIT,0) AS USERLIMIT,
                ISNULL(AKILLIBLOKE,0) AS AKILLIBLOKE,
-               MAPX1, MAPY1, MAPX2, MAPY2, TEMA
+               MAPX1, MAPY1, MAPX2, MAPY2, TEMA,
+               ISNULL(GORUNUM,0) AS GORUNUM, ISNULL(ARACLARIGRUPLA,0) AS ARACLARIGRUPLA, ISNULL(KOPUKLARIFILTRE,0) AS KOPUKLARIFILTRE
         FROM users WITH (NOLOCK)
         WHERE ID = @id
         """;
@@ -47,6 +48,7 @@ public static class Sql
                c.GPSHATA, c.SKBATTERY AS BATARYA, c.ISI,
                dbo.surucuBul(@kullaniciId, c.SOFOR) AS SURUCU,
                c.SKTARIH AS GPS_TARIH, c.KONTROLTARIH AS SINYAL_TARIH,
+               DATEDIFF(hour, c.KONTROLTARIH, GETDATE()) AS SINYAL_YASI_SAAT,
                c.SKKONUM AS ADRES, c.SKRAPORKODU AS RAPOR_KODU, c.SKALARM AS ALARM,
                c.DVRIPNO, c.MOTOR,
                dbo.kadranKm(c.CIHAZID) AS KADRAN_KM, dbo.gunlukMesafe(c.CIHAZID) AS GUNLUK_KM
@@ -99,6 +101,17 @@ public static class Sql
             SELECT 1;
         END
         ELSE SELECT 0;
+        """;
+
+    // Görünüm tercihleri: eski sitedeki _setClientView.asp (GORUNUM) ve _prcSetOption.asp
+    // (ARACLARIGRUPLA, KOPUKLARIFILTRE) ile aynı alanlar; yalnızca oturumdaki kullanıcının kaydı.
+    // NULL gelen parametre o alanı değiştirmez.
+    public const string GorunumKaydet = """
+        UPDATE users SET
+            GORUNUM = COALESCE(@gorunum, GORUNUM),
+            ARACLARIGRUPLA = COALESCE(@grupla, ARACLARIGRUPLA),
+            KOPUKLARIFILTRE = COALESCE(@arizaliGizle, KOPUKLARIFILTRE)
+        WHERE ID = @id
         """;
 
     // data/_getFleets.asp

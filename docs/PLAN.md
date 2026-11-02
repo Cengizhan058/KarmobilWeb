@@ -65,7 +65,9 @@ Cihazlar ──> Gateway ──> MSSQL (requests) <── eski ASP site / mobil 
 ## İlerleme
 - [x] 1. İskelet (giriş, tema, menü, harita) - 9fbec00
 - [x] 2. Araç listesi + canlı konum - db1e65b; araç bilgi paneli - cf64a96
-- [ ] 2. kalan: haritada gruplama (cluster), filtre ağacı (GPS verisi / cihaz türü / araç durumu), görünüm ayarları
+- [x] 2. kalan: liste aç/kapa, kümeleme, Görünüm ayarları (etiket / grupla / arızalıları gizle; users tablosuna eski siteyle aynı alanlar), araç/kişi filtresi.
+  Not: eski filtre ağacındaki 'Araç Durumu' (aktif/sabit nokta/arızalı/yetersiz personel) eski kodda hiç atanmayan
+  cihaz_durum alanına bakıyordu, fiilen çalışmıyordu; taşınmadı.
 - [ ] 3. Geçmiş izleme
 
 ## Açık sorular

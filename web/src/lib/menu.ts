@@ -16,6 +16,8 @@ export type MenuMaddesi = {
   ad: string
   ikon: LucideIcon
   yol?: string
+  /** Gezinme yerine görünüm ayarı (Görünüm menüsü): onay kutusu ya da etiket seçimi. */
+  ayar?: 'grupla' | 'arizali' | 'etiket'
   goster?: (k: OturumKullanici) => boolean
   alt?: MenuMaddesi[]
 }
@@ -86,9 +88,9 @@ export const MENU: MenuMaddesi[] = [
   { id: 'mesajlar', ad: 'Mesajlar', ikon: Mail },
   {
     id: 'gorunum', ad: 'Görünüm', ikon: Eye, alt: [
-      { id: 'arac_grupla', ad: 'Araçları Haritada Grupla', ikon: Layers },
-      { id: 'arizali_gosterme', ad: 'Arızalı Araçları Haritada Gösterme', ikon: TriangleAlert },
-      { id: 'client_view', ad: 'Araç Etiketi', ikon: Tag },
+      { id: 'arac_grupla', ad: 'Araçları haritada grupla', ikon: Layers, ayar: 'grupla' },
+      { id: 'arizali_gosterme', ad: 'Arızalı araçları gösterme (72 sa+ sinyalsiz)', ikon: TriangleAlert, ayar: 'arizali' },
+      { id: 'client_view', ad: 'Araç etiketi', ikon: Tag, ayar: 'etiket' },
     ],
   },
   {

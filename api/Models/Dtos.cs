@@ -19,8 +19,10 @@ public sealed record AracKonumDto(
     string? Surucu,
     DateTime? GpsTarihi,
     DateTime? SinyalTarihi,
+    int? SinyalYasiSaat,
     string? Adres,
     string? CihazTipi,
+    int CihazTuru,
     List<int> GrupIdleri,
     bool Dvr,
     bool MotorBlokeli,
@@ -56,6 +58,9 @@ public sealed record AracDetayDto(
     string? SonAlarmAdresi,
     DateTime? IlkSinyal,
     DateTime? KayitTarihi);
+
+/// <summary>Görünüm tercihleri; verilmeyen alan değişmez.</summary>
+public sealed record GorunumIstegi(int? Etiket, bool? AraclariGrupla, bool? ArizalilariGizle);
 
 public sealed record GrupDto(int Id, string Ad, int? UstId);
 

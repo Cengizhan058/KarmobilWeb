@@ -88,6 +88,21 @@ public sealed class SqlDb(IConfiguration config, ILogger<SqlDb> logger)
     }
 
     // -----------------------------------------------------------------------
+    //  Yazma (yalnızca yeni arayüzün kendi işlemleri: görünüm tercihleri, anlık konum)
+    // -----------------------------------------------------------------------
+
+    /// <summary>Tek bir yazma deyimi çalıştırır; etkilenen satır sayısını döner.</summary>
+    public async Task<int> CalistirAsync(
+        string sql,
+        IReadOnlyDictionary<string, object?>? parametreler = null,
+        CancellationToken ct = default)
+    {
+        await using var conn = await AcAsync(ct);
+        await using var cmd = KomutHazirla(conn, sql, parametreler);
+        return await cmd.ExecuteNonQueryAsync(ct);
+    }
+
+    // -----------------------------------------------------------------------
     //  Yardımcılar
     // -----------------------------------------------------------------------
 

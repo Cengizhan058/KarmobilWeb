@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronDown, LogOut } from 'lucide-react'
-import { auth, type OturumKullanici } from '../api/client.ts'
+import { Check, ChevronDown, LogOut } from 'lucide-react'
+import { auth, type GorunumAyari, type OturumKullanici } from '../api/client.ts'
 import { gorunurMenu, type MenuMaddesi } from '../lib/menu.ts'
 import TemaSecici from './TemaSecici.tsx'
 
-export default function UstMenu({ kullanici }: { kullanici: OturumKullanici }) {
+const ETIKETLER = ['Plaka', 'Cihaz ID', 'Sürücü', 'Hız']
+
+export default function UstMenu({ kullanici, onGorunum }: { kullanici: OturumKullanici; onGorunum: (a: GorunumAyari) => void }) {
   const navigate = useNavigate()
   const [acikId, setAcikId] = useState<string | null>(null)
   const cubuk = useRef<HTMLElement>(null)
@@ -60,6 +62,25 @@ export default function UstMenu({ kullanici }: { kullanici: OturumKullanici }) {
                 <div className="alt-menu">
                   {m.alt.map(a => {
                     const AltIkon = a.ikon
+                    if (a.ayar === 'etiket') return (
+                      <div key={a.id} className="alt-grup">
+                        <div className="alt-grup-baslik"><AltIkon size={16} />{a.ad}</div>
+                        {ETIKETLER.map((e, i) => (
+                          <button key={e} className="alt-madde secenek" onClick={() => onGorunum({ etiket: i })}>
+                            <span className={'radyo' + (kullanici.etiket === i ? ' secili' : '')} />{e}
+                          </button>
+                        ))}
+                      </div>
+                    )
+                    if (a.ayar === 'grupla' || a.ayar === 'arizali') {
+                      const deger = a.ayar === 'grupla' ? kullanici.araclariGrupla : kullanici.arizalilariGizle
+                      return (
+                        <button key={a.id} className="alt-madde" onClick={() => onGorunum(a.ayar === 'grupla' ? { araclariGrupla: !deger } : { arizalilariGizle: !deger })}>
+                          <span className={'onay' + (deger ? ' secili' : '')}>{deger && <Check size={12} />}</span>
+                          <span>{a.ad}</span>
+                        </button>
+                      )
+                    }
                     return (
                       <button key={a.id} className="alt-madde" onClick={() => git(a)}>
                         <AltIkon size={16} />

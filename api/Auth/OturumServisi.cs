@@ -44,7 +44,10 @@ public sealed class OturumServisi(SqlDb db)
             AltKullaniciLimiti: (int)Sayi(s["USERLIMIT"]),
             AkilliBlokaj: Sayi(s["AKILLIBLOKE"]) == 1,
             HaritaSiniri: sinir,
-            Tema: s["TEMA"] as string);
+            Tema: s["TEMA"] as string,
+            Etiket: (int)Math.Clamp(Sayi(s["GORUNUM"]), 0, 3),
+            AraclariGrupla: Sayi(s["ARACLARIGRUPLA"]) == 1,
+            ArizalilariGizle: Sayi(s["KOPUKLARIFILTRE"]) == 1);
     }
 
     private static long Sayi(object? deger) =>

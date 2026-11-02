@@ -2,9 +2,13 @@ import { useMemo, useState } from 'react'
 import { PanelLeftClose, Search, X } from 'lucide-react'
 import type { AracDurumu, AracKonum, Grup } from '../api/client.ts'
 import { DURUMLAR, DURUM_SIRASI, aramaMetni, kisaZaman, temizAdres } from '../lib/arac.ts'
+import type { TurFiltre } from '../pages/Harita.tsx'
 
 type Props = {
   araclar: AracKonum[]
+  kisiVar: boolean
+  turFiltre: TurFiltre
+  onTur: (t: TurFiltre) => void
   gruplar: Grup[]
   grupId: number | null
   onGrup: (id: number | null) => void
@@ -15,7 +19,7 @@ type Props = {
   onKapat: () => void
 }
 
-export default function AracListesi({ araclar, gruplar, grupId, onGrup, seciliId, onSec, durumFiltre, onDurumFiltre, onKapat }: Props) {
+export default function AracListesi({ araclar, kisiVar, turFiltre, onTur, gruplar, grupId, onGrup, seciliId, onSec, durumFiltre, onDurumFiltre, onKapat }: Props) {
   const [arama, setArama] = useState('')
 
   const sayilar = useMemo(() => {
@@ -69,6 +73,14 @@ export default function AracListesi({ araclar, gruplar, grupId, onGrup, seciliId
             </button>
           ))}
         </div>
+
+        {kisiVar && (
+          <div className="tur-secici">
+            {([['hepsi', 'Tümü'], ['arac', 'Araçlar'], ['kisi', 'Kişiler']] as [TurFiltre, string][]).map(([id, ad]) => (
+              <button key={id} className={turFiltre === id ? 'secili' : ''} onClick={() => onTur(id)}>{ad}</button>
+            ))}
+          </div>
+        )}
 
         <div className="arama">
           <Search size={15} />

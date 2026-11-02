@@ -116,6 +116,24 @@ input { font: inherit; }
 .alt-madde svg { color: var(--vurgu); flex: none; }
 .alt-madde:hover { background: var(--vurgu-acik); color: var(--vurgu); }
 
+/* Görünüm menüsündeki ayarlar */
+.onay, .radyo {
+  flex: none;
+  display: grid; place-items: center;
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--soluk);
+  background: var(--yuzey);
+  color: #fff;
+}
+.onay { border-radius: 4px; }
+.radyo { border-radius: 50%; }
+.onay.secili { background: var(--vurgu); border-color: var(--vurgu); }
+.radyo.secili { border-color: var(--vurgu); box-shadow: inset 0 0 0 3px var(--yuzey), inset 0 0 0 8px var(--vurgu); }
+.alt-grup { margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--cizgi); }
+.alt-grup-baslik { display: flex; align-items: center; gap: 10px; padding: 6px 12px; color: var(--soluk); font-size: 13px; }
+.alt-grup-baslik svg { color: var(--vurgu); }
+.alt-madde.secenek { padding-left: 38px; }
+
 .ust-kullanici {
   display: flex; align-items: center; gap: 10px;
   height: 100%;
@@ -243,6 +261,22 @@ input { font: inherit; }
 .etiket { flex: none; padding: 0 6px; border-radius: 5px; background: var(--yuzey-2); color: var(--yazi-2); font-size: 12px; line-height: 18px; font-variant-numeric: tabular-nums; }
 .etiket.hiz { background: var(--vurgu-acik); color: var(--vurgu); }
 .panel-bos { padding: 24px 16px; color: var(--soluk); }
+
+.tur-secici { display: flex; gap: 2px; margin-bottom: 10px; padding: 3px; border-radius: 8px; background: var(--yuzey-2); }
+.tur-secici button { flex: 1; height: 28px; border: 0; border-radius: 6px; background: transparent; color: var(--soluk); font-size: 13px; }
+.tur-secici button.secili { background: var(--yuzey); color: var(--vurgu); font-weight: 500; box-shadow: 0 1px 2px rgba(0, 0, 0, .1); }
+
+/* Küme (gruplanmış araçlar) */
+.kume-isaret div {
+  display: grid; place-items: center;
+  border: 3px solid rgba(255, 255, 255, .9);
+  border-radius: 50%;
+  background: var(--bar-koyu);
+  color: #fff;
+  font: 700 14px var(--font);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--bar-koyu) 30%, transparent), 0 2px 8px rgba(0, 0, 0, .35);
+  cursor: pointer;
+}
 
 /* Harita işaretleri */
 .arac-isaret { position: relative; }
