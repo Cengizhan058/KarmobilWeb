@@ -114,6 +114,17 @@ public static class Sql
         WHERE ID = @id
         """;
 
+    // data/_raporKonum.asp: geçmiş konumlar saklı yordamla (POI hesaplı / hesapsız).
+    // Tarihler yordamda nvarchar 'yyyy-MM-dd HH:mm:ss'.
+    public const string GecmisKonumlar = "EXEC reportPosNewKadranNoPoi @cihazid = @cihazId, @tarih1 = @t1, @tarih2 = @t2, @user_id = @kullaniciId";
+    public const string GecmisKonumlarPoi = "EXEC reportPosNewKadran @cihazid = @cihazId, @tarih1 = @t1, @tarih2 = @t2, @user_id = @kullaniciId";
+
+    // data/_prcToplamMesafe.asp
+    public const string AralikMesafe = "SELECT dbo.mesafeHesapla(@cihazId, @t1, @t2) AS MESAFE";
+
+    // _raporKonum.asp: VI (kart okutma) kaydında SITUATIONS alanı sürücü kartıdır.
+    public const string SurucuBul = "SELECT dbo.surucuBul(@kullaniciId, @kart) AS SURUCU";
+
     // data/_getFleets.asp
     public const string Gruplar = """
         SELECT ID, GROUPNAME, PARENTID FROM groups WITH (NOLOCK)

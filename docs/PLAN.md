@@ -68,7 +68,9 @@ Cihazlar ──> Gateway ──> MSSQL (requests) <── eski ASP site / mobil 
 - [x] 2. kalan: liste aç/kapa, kümeleme, Görünüm ayarları (etiket / grupla / arızalıları gizle; users tablosuna eski siteyle aynı alanlar), araç/kişi filtresi.
   Not: eski filtre ağacındaki 'Araç Durumu' (aktif/sabit nokta/arızalı/yetersiz personel) eski kodda hiç atanmayan
   cihaz_durum alanına bakıyordu, fiilen çalışmıyordu; taşınmadı.
-- [ ] 3. Geçmiş izleme
+- [x] 3. Geçmiş izleme: reportPosNewKadran(NoPoi) yordamı, hız renkli rota, duraklamalar (eşik seçilebilir), oynatma,
+  liste (park gruplama), hız grafiği, Excel (CSV) ve Yazdır/PDF
+- [ ] 4. Raporlar
 
 ## Açık sorular
 - Gateway: nerede çalışıyor, hangi teknoloji, hangi tablolara yazıyor (`konumlar`, `clients`, `uyarilar`...)?

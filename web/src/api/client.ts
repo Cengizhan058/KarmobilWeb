@@ -102,6 +102,36 @@ export type AracDetay = {
   kayitTarihi: string | null
 }
 
+export type GecmisNokta = {
+  id: number
+  zaman: string
+  lat: number
+  lon: number
+  hiz: number
+  yon: number
+  kontak: boolean
+  raporKodu: string
+  durum: string
+  alarm: string | null
+  adres: string | null
+  surucu: string | null
+  isi: number | null
+  kadranKm: number | null
+}
+
+export type Duraklama = { baslangic: string; bitis: string; dakika: number; lat: number; lon: number; adres: string | null; kontak: boolean }
+
+export type Gecmis = {
+  aracId: number
+  plaka: string
+  baslangic: string
+  bitis: string
+  toplamKm: number
+  azamiHiz: number
+  noktalar: GecmisNokta[]
+  duraklar: Duraklama[]
+}
+
 export class ApiHatasi extends Error {
   durum: number
   kod?: string
@@ -162,6 +192,8 @@ export const api = {
   araclar: (grupId?: number | null) => istek<AracKonum[]>('/api/araclar' + (grupId ? `?grupId=${grupId}` : '')),
   gruplar: () => istek<Grup[]>('/api/gruplar'),
   gorunumKaydet: (ayar: GorunumAyari) => istek<void>('/api/ayarlar/gorunum', { method: 'PUT', body: JSON.stringify(ayar) }),
+  gecmis: (aracId: number, baslangic: string, bitis: string, poi: boolean) =>
+    istek<Gecmis>(`/api/gecmis?aracId=${aracId}&baslangic=${encodeURIComponent(baslangic)}&bitis=${encodeURIComponent(bitis)}&poi=${poi}`),
   aracDetay: (id: number) => istek<AracDetay>(`/api/araclar/${id}/detay`),
   // Gerçek cihaza komut gönderir (cihazkomut tablosuna SK yazılır).
   anlikKonumIste: (id: number) => istek<{ mesaj: string }>(`/api/araclar/${id}/anlik-konum`, { method: 'POST' }),

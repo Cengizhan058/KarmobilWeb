@@ -63,7 +63,7 @@ export const MENU: MenuMaddesi[] = [
   {
     id: 'raporlar', ad: 'Raporlar', ikon: BarChart3, alt: [
       { id: 'report_last', ad: 'Son Konumlar', ikon: MapPin },
-      { id: 'report_past', ad: 'Geçmiş İzleme', ikon: History, goster: r },
+      { id: 'report_past', ad: 'Geçmiş İzleme', ikon: History, goster: r, yol: '/gecmis' },
       { id: 'report_activity', ad: 'Günlük Aktivite Raporu', ikon: CalendarDays, goster: r },
       { id: 'report_distance_tbl', ad: 'Aylık KM (Tablo) Raporu', ikon: Route, goster: r },
       { id: 'report_workhours', ad: 'Toplam Mesai KM Raporu', ikon: Clock, goster: r },

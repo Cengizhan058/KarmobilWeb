@@ -59,6 +59,34 @@ public sealed record AracDetayDto(
     DateTime? IlkSinyal,
     DateTime? KayitTarihi);
 
+public sealed record GecmisNoktaDto(
+    long Id,
+    DateTime Zaman,
+    double Lat,
+    double Lon,
+    int Hiz,
+    double Yon,
+    bool Kontak,
+    string RaporKodu,
+    string Durum,
+    string? Alarm,
+    string? Adres,
+    string? Surucu,
+    double? Isi,
+    double? KadranKm);
+
+public sealed record DuraklamaDto(DateTime Baslangic, DateTime Bitis, int Dakika, double Lat, double Lon, string? Adres, bool Kontak);
+
+public sealed record GecmisDto(
+    int AracId,
+    string Plaka,
+    DateTime Baslangic,
+    DateTime Bitis,
+    double ToplamKm,
+    int AzamiHiz,
+    List<GecmisNoktaDto> Noktalar,
+    List<DuraklamaDto> Duraklar);
+
 /// <summary>Görünüm tercihleri; verilmeyen alan değişmez.</summary>
 public sealed record GorunumIstegi(int? Etiket, bool? AraclariGrupla, bool? ArizalilariGizle);
 

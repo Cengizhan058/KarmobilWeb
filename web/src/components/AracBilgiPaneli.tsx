@@ -97,7 +97,7 @@ export default function AracBilgiPaneli({ arac, takipte, onTakip, onYaklas, onKa
         <button onClick={onYaklas}><Crosshair size={16} />Yakınlaştır</button>
         <button className={takipte ? 'etkin' : ''} onClick={onTakip}><Navigation size={16} />{takipte ? 'Takibi bırak' : 'Takip et'}</button>
         <button onClick={() => setOnay(true)} disabled={gonderiyor}><Radio size={16} />Anlık konum</button>
-        <button onClick={() => navigate(`/yapim/report_past?ad=${encodeURIComponent('Geçmiş İzleme')}&arac=${arac.id}`)}><History size={16} />Geçmiş</button>
+        <button onClick={() => navigate(`/gecmis?arac=${arac.id}`)}><History size={16} />Geçmiş</button>
         {detay?.dvrAdresi && (
           <a className="dugme" href={`http://${detay.dvrAdresi}`} target="_blank" rel="noreferrer"><Video size={16} />Kamera</a>
         )}
