@@ -585,3 +585,38 @@ input { font: inherit; }
   .giris-panel { flex: 1; background: var(--zemin); padding: 24px 16px; }
   .giris-kart { padding: 28px 22px; border-radius: 14px; background: var(--yuzey); box-shadow: var(--golge); }
 }
+
+/* ---------- İşlemler: nokta grupları, bölgeler, rotalar ---------- */
+.islem-panel { padding-top: 0; }
+.islem-sekmeler { margin: 0 -16px 12px; padding-left: 10px; }
+.islem-sekmeler button { display: inline-flex; align-items: center; gap: 6px; }
+.islem-baslik { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 12px 0 8px; }
+.islem-baslik h3 { margin: 0; font-size: 15px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.islem-baslik .ikincil-dugme { display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px; font-size: 13px; flex: none; }
+.islem-liste { list-style: none; margin: 0; padding: 0; max-height: 240px; overflow-y: auto; border: 1px solid var(--cizgi); border-radius: 8px; }
+.islem-liste li { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-bottom: 1px solid var(--cizgi); cursor: pointer; }
+.islem-liste li:last-child { border-bottom: 0; }
+.islem-liste li:hover { background: var(--yuzey-2); }
+.islem-liste li.secili { background: var(--vurgu-acik); color: var(--vurgu); font-weight: 500; }
+.islem-liste li.bos { color: var(--soluk); cursor: default; }
+.islem-liste li span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.islem-liste li small { color: var(--soluk); font-variant-numeric: tabular-nums; }
+.islem-liste img { width: 18px; height: 18px; object-fit: contain; }
+.renk-nokta { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+.islem-form { margin-top: 14px; padding-top: 4px; border-top: 1px solid var(--cizgi); }
+.islem-form input[type=range] { width: 100%; accent-color: var(--vurgu); }
+.renk-alan input[type=color] { width: 60px; height: 34px; padding: 2px; border: 1px solid var(--cizgi); border-radius: 6px; background: var(--yuzey); }
+.ikon-izgara { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
+.ikon-izgara button { display: grid; place-items: center; aspect-ratio: 1; padding: 2px; border: 1px solid var(--cizgi); border-radius: 6px; background: var(--yuzey); }
+.ikon-izgara button.secili { border-color: var(--vurgu); box-shadow: 0 0 0 2px var(--vurgu-acik); }
+.ikon-izgara img { max-width: 22px; max-height: 22px; }
+.kucuk-not { margin: 0 0 10px; font-size: 12.5px; color: var(--soluk); }
+.islem-dugmeler { display: flex; gap: 8px; align-items: center; }
+.islem-dugmeler .ana-dugme { flex: 1; margin: 0; }
+.ikincil-dugme.tam { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; margin-bottom: 12px; }
+.ikincil-dugme.tehlike { display: inline-flex; align-items: center; gap: 4px; height: 40px; color: #c92a2a; border-color: #f1b0b0; }
+.bilgi-kutu { margin: 0 0 10px; padding: 9px 12px; border-radius: 8px; background: #e6f6ec; color: #1f6b3a; }
+.yapim.kucuk { height: auto; padding: 30px 10px; }
+
+.cizim-modu .leaflet-container { cursor: crosshair; }
+.islem-isaret { border: 2px solid #fff; border-radius: 50%; background: var(--vurgu); box-shadow: 0 0 0 1px rgba(0,0,0,.4); }

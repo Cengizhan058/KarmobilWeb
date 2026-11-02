@@ -66,12 +66,13 @@ public static class KatmanEndpoints
                     ikon = s["ICONID"]?.ToString(),
                     boyut = s["ICONSIZE"] is null ? 24 : Tam(s["ICONSIZE"]),
                     paylasilan = Tam(s["USERID"]) != k.Id,
+                    paylas = s["SUBUSERS"] is not null && Tam(s["SUBUSERS"]) == 1,
                     noktalar = noktaSatirlari.Where(n => Tam(n["LAYERID"]) == id && Sayi(n["X"]) is not null && Sayi(n["Y"]) is not null)
                         .Select(n => new
                         {
                             id = Tam(n["ID"]),
                             baslik = (n["TITLE"] as string ?? "").Trim(),
-                            aciklama = (n["DESCRIPTION"] as string)?.Trim(),
+                            aciklama = Raporlar.RaporYardimci.Metin(n["DESCRIPTION"]),
                             lat = Sayi(n["Y"])!.Value,
                             lon = Sayi(n["X"])!.Value,
                             cap = n["DIAMETER"] is null ? (int?)null : Tam(n["DIAMETER"]),

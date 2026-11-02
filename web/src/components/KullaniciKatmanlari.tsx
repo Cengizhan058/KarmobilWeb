@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Circle, CircleMarker, Polygon, Polyline, Tooltip } from 'react-leaflet'
+import { Circle, Marker, Polygon, Polyline, Tooltip } from 'react-leaflet'
 import { Layers, X } from 'lucide-react'
 import { api, type HaritaKatmanlari } from '../api/client.ts'
+import { poiIkonu } from '../lib/poi.ts'
 
 // Açık katmanlar tarayıcıda saklanır: "b:12" bölge, "k:3" nokta grubu, "r:5" rota.
 const ANAHTAR = 'km-katmanlar'
@@ -25,9 +26,9 @@ export function KatmanCizimi({ veri, acik }: { veri: HaritaKatmanlari | null; ac
         </Polyline>
       ))}
       {veri.katmanlar.filter(k => acik.has(`k:${k.id}`)).flatMap(k => k.noktalar.map(n => (
-        <CircleMarker key={`n${n.id}`} center={[n.lat, n.lon]} radius={7} pathOptions={{ color: '#fff', weight: 2, fillColor: k.renk, fillOpacity: 1 }}>
-          <Tooltip direction="top" offset={[0, -6]}><strong>{n.baslik}</strong>{n.aciklama ? <><br />{n.aciklama}</> : null}<br /><span className="soluk">{k.ad}</span></Tooltip>
-        </CircleMarker>
+        <Marker key={`n${n.id}`} position={[n.lat, n.lon]} icon={poiIkonu(k.ikon, k.boyut)}>
+          <Tooltip direction="top" offset={[0, -8]}><strong>{n.baslik}</strong>{n.aciklama ? <><br />{n.aciklama}</> : null}<br /><span className="soluk">{k.ad}</span></Tooltip>
+        </Marker>
       )))}
       {/* POI yarıçapı (DIAMETER, metre) varsa çevresi de gösterilir. */}
       {veri.katmanlar.filter(k => acik.has(`k:${k.id}`)).flatMap(k => k.noktalar.filter(n => n.cap && n.cap > 0).map(n => (

@@ -156,7 +156,7 @@ export type RaporSonucu = {
 export type HaritaKatmanlari = {
   bolgeler: { id: number; ad: string; renk: string; noktalar: [number, number][] }[]
   katmanlar: {
-    id: number; ad: string; renk: string; ikon: string | null; boyut: number; paylasilan: boolean
+    id: number; ad: string; renk: string; ikon: string | null; boyut: number; paylasilan: boolean; paylas: boolean
     noktalar: { id: number; baslik: string; aciklama: string | null; lat: number; lon: number; cap: number | null }[]
   }[]
   rotalar: { id: number; ad: string; renk: string; noktalar: [number, number][] }[]
@@ -229,6 +229,16 @@ export const api = {
   raporSecenekleri: (kaynak: string) => istek<{ deger: string; ad: string }[]>(`/api/raporlar/secenekler/${kaynak}`),
   rapor: (kod: string, sorgu: URLSearchParams) => istek<RaporSonucu>(`/api/raporlar/${kod}?${sorgu}`),
   aracDetay: (id: number) => istek<AracDetay>(`/api/araclar/${id}/detay`),
+  // İşlemler: kullanıcının kendi nokta grupları, noktaları, bölgeleri ve rotaları. Noktalar [[enlem, boylam], ...].
+  katmanKaydet: (id: number | null, k: { ad: string; ikon: string; boyut: number; paylas: boolean }) =>
+    istek<{ id?: number; mesaj: string }>(id ? `/api/katmanlar/${id}` : '/api/katmanlar', { method: id ? 'PUT' : 'POST', body: JSON.stringify(k) }),
+  katmanSil: (id: number) => istek<{ mesaj: string }>(`/api/katmanlar/${id}`, { method: 'DELETE' }),
+  noktaKaydet: (katmanId: number, id: number | null, n: { baslik: string; cap: number; lat: number; lon: number }) =>
+    istek<{ id?: number; mesaj: string }>(id ? `/api/noktalar/${id}` : `/api/katmanlar/${katmanId}/noktalar`, { method: id ? 'PUT' : 'POST', body: JSON.stringify(n) }),
+  noktaSil: (id: number) => istek<{ mesaj: string }>(`/api/noktalar/${id}`, { method: 'DELETE' }),
+  sekilKaydet: (tur: 'bolgeler' | 'rotalar', id: number | null, s: { ad: string; renk: string; noktalar: [number, number][] | null }) =>
+    istek<{ id?: number; mesaj: string }>(id ? `/api/${tur}/${id}` : `/api/${tur}`, { method: id ? 'PUT' : 'POST', body: JSON.stringify(s) }),
+  sekilSil: (tur: 'bolgeler' | 'rotalar', id: number) => istek<{ mesaj: string }>(`/api/${tur}/${id}`, { method: 'DELETE' }),
   // Gerçek cihaza komut gönderir (cihazkomut tablosuna SK yazılır).
   anlikKonumIste: (id: number) => istek<{ mesaj: string }>(`/api/araclar/${id}/anlik-konum`, { method: 'POST' }),
 }

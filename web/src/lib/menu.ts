@@ -27,12 +27,12 @@ const r = (k: OturumKullanici) => k.raporlar
 export const MENU: MenuMaddesi[] = [
   {
     id: 'islemler', ad: 'İşlemler', ikon: Wrench, alt: [
-      { id: 'layer_duzenle', ad: 'Nokta Grupları / Katmanlar', ikon: Layers },
-      { id: 'poi_add', ad: 'Nokta / POI Ekle', ikon: MapPin },
-      { id: 'poi_duzenle', ad: 'Nokta / POI Düzenle', ikon: MapPin },
-      { id: 'bolge_ekle', ad: 'Yeni Bölge Oluştur', ikon: Pentagon },
-      { id: 'bolge_duzenle', ad: 'Bölge Düzenle', ikon: Pentagon },
-      { id: 'rota_duzenle', ad: 'Rotaları Düzenle / Sil', ikon: Route },
+      { id: 'layer_duzenle', ad: 'Nokta Grupları / Katmanlar', ikon: Layers, yol: '/islemler?sekme=nokta' },
+      { id: 'poi_add', ad: 'Nokta / POI Ekle', ikon: MapPin, yol: '/islemler?sekme=nokta&yeni=1' },
+      { id: 'poi_duzenle', ad: 'Nokta / POI Düzenle', ikon: MapPin, yol: '/islemler?sekme=nokta' },
+      { id: 'bolge_ekle', ad: 'Yeni Bölge Oluştur', ikon: Pentagon, yol: '/islemler?sekme=bolge&yeni=1' },
+      { id: 'bolge_duzenle', ad: 'Bölge Düzenle', ikon: Pentagon, yol: '/islemler?sekme=bolge' },
+      { id: 'rota_duzenle', ad: 'Rotaları Düzenle / Sil', ikon: Route, yol: '/islemler?sekme=rota' },
     ],
   },
   {

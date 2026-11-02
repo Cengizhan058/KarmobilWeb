@@ -75,7 +75,7 @@ Cihazlar ──> Gateway ──> MSSQL (requests) <── eski ASP site / mobil 
   Açık: eski sitede DB'den dolan seçim listeleri (alarm türü, sürücü kimliği, nokta grubu/nokta, can-bus giriş türü,
   bölge) şimdilik metin alanı; bazı yordamların dönüş kolon adları ve konumsal parametreleri eski ASP'den çıkarıldı.
   İstisna: rapor SQL'leri Data/Sql.cs yerine her raporun kendi dosyasında (Raporlar/*.cs).
-- [ ] 5. İşlemler: harita katmanları (bölge / nokta / rota) görüntüleme yapıldı; ekleme/düzenleme kaldı
+- [x] 5. İşlemler: /islemler ekranı (nokta grupları + POI, bölgeler, rotalar: ekle/düzenle/sil, haritaya tıklayarak çizim). Yazmalar yalnız kullanıcının kendi kayıtlarına; eski sitedeki iki sahiplik açığı (katman silerken başkasının noktaları, sahibi denetlenmeyen nokta ekleme) kapatıldı. Fark: eski rota ekranı yol takibi (routing) yapıyordu, yeni ekranda rota tıklanan noktalar arası düz çizgi; rota şekli eskisi gibi sonradan değiştirilemez (yalnız ad/renk).
 
 ## Açık sorular
 - Gateway: nerede çalışıyor, hangi teknoloji, hangi tablolara yazıyor (`konumlar`, `clients`, `uyarilar`...)?

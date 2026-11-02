@@ -6,6 +6,7 @@ import Harita from './pages/Harita.tsx'
 import YapimAsamasinda from './pages/YapimAsamasinda.tsx'
 import Gecmis from './pages/Gecmis.tsx'
 import Rapor from './pages/Rapor.tsx'
+import Islemler from './pages/Islemler.tsx'
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route index element={<Harita />} />
         <Route path="gecmis" element={<Gecmis />} />
         <Route path="rapor/:kod" element={<Rapor />} />
+        <Route path="islemler" element={<Islemler />} />
         <Route path="yapim/:id" element={<YapimAsamasinda />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

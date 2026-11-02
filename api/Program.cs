@@ -102,6 +102,7 @@ app.MapArac();
 app.MapGecmis();
 app.MapRapor();
 app.MapKatman();
+app.MapIslem();
 
 // ---------------------------------------------------------------------------
 // Arayüzün API ile birlikte sunulması (isteğe bağlı)
