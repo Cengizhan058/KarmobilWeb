@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Search, X } from 'lucide-react'
+import { PanelLeftClose, Search, X } from 'lucide-react'
 import type { AracDurumu, AracKonum, Grup } from '../api/client.ts'
 import { DURUMLAR, DURUM_SIRASI, aramaMetni, kisaZaman, temizAdres } from '../lib/arac.ts'
 
@@ -12,9 +12,10 @@ type Props = {
   onSec: (a: AracKonum) => void
   durumFiltre: Set<AracDurumu>
   onDurumFiltre: (s: Set<AracDurumu>) => void
+  onKapat: () => void
 }
 
-export default function AracListesi({ araclar, gruplar, grupId, onGrup, seciliId, onSec, durumFiltre, onDurumFiltre }: Props) {
+export default function AracListesi({ araclar, gruplar, grupId, onGrup, seciliId, onSec, durumFiltre, onDurumFiltre, onKapat }: Props) {
   const [arama, setArama] = useState('')
 
   const sayilar = useMemo(() => {
@@ -48,6 +49,9 @@ export default function AracListesi({ araclar, gruplar, grupId, onGrup, seciliId
               {gruplar.map(g => <option key={g.id} value={g.id}>{g.ad}</option>)}
             </select>
           )}
+          <button className="ikon-dugme panel-kapat" title="Listeyi gizle" onClick={onKapat}>
+            <PanelLeftClose size={18} />
+          </button>
         </div>
 
         <div className="durum-sayaclari">

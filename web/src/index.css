@@ -180,6 +180,19 @@ input { font: inherit; }
 .panel-baslik-satir { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
 .panel-baslik-satir h3 { margin: 0; font-size: 16px; font-weight: 500; color: var(--yazi); }
 .sayi { margin-left: 4px; padding: 1px 8px; border-radius: 10px; background: var(--vurgu-acik); color: var(--vurgu); font-size: 12px; font-weight: 700; }
+.panel-baslik-satir h3 { margin-right: auto; }
+.panel-kapat { color: var(--soluk); flex: none; }
+.panel-kapat:hover { background: var(--yuzey-2); color: var(--vurgu); }
+.liste-ac {
+  position: absolute; left: 12px; top: 12px; z-index: 600;
+  display: flex; align-items: center; gap: 8px;
+  height: 38px; padding: 0 12px;
+  border: 1px solid var(--cizgi); border-radius: 9px;
+  background: var(--yuzey); color: var(--yazi);
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+}
+.liste-ac:hover { color: var(--vurgu); border-color: var(--vurgu); }
 .grup-secim { max-width: 160px; height: 30px; padding: 0 8px; border: 1px solid var(--cizgi); border-radius: 7px; background: var(--yuzey); color: var(--yazi); font: inherit; font-size: 13px; }
 
 .durum-sayaclari { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'
+import { MapContainer, Marker, TileLayer, ZoomControl, useMap } from 'react-leaflet'
+import { PanelLeftOpen } from 'lucide-react'
 import L, { type LatLngBoundsExpression } from 'leaflet'
 import { api, type AracDurumu, type AracKonum, type Grup } from '../api/client.ts'
 import { useKullanici } from '../components/Duzen.tsx'
@@ -66,6 +67,20 @@ function SeciliyeGit({ arac, istek, takip }: { arac: AracKonum | null; istek: nu
   return null
 }
 
+// Liste açılıp kapanınca harita kabının genişliği değişir; Leaflet'e haber verilmezse karolar eksik çizilir.
+function BoyutYenile({ anahtar }: { anahtar: unknown }) {
+  const map = useMap()
+  useEffect(() => {
+    const t = setTimeout(() => map.invalidateSize({ animate: false }), 220)
+    return () => clearTimeout(t)
+  }, [anahtar, map])
+  return null
+}
+
+function listeTercihi(): boolean {
+  try { return localStorage.getItem('km-liste') !== 'kapali' } catch { return true }
+}
+
 export default function Harita() {
   const k = useKullanici()
   const [katman, setKatman] = useState<KatmanId>('sokak')
@@ -78,6 +93,7 @@ export default function Harita() {
   const [durumFiltre, setDurumFiltre] = useState<Set<AracDurumu>>(new Set())
   const [hata, setHata] = useState<string | null>(null)
   const [takip, setTakip] = useState(false)
+  const [listeAcik, setListeAcik] = useState(listeTercihi)
   const [yaklasIstegi, setYaklasIstegi] = useState(0)
 
   useEffect(() => { api.gruplar().then(setGruplar).catch(() => { /* grup yoksa seçim gizlenir */ }) }, [])
@@ -111,6 +127,11 @@ export default function Harita() {
     setYaklasIstegi(n => n + 1)
   }
 
+  const listeyiAyarla = (acik: boolean) => {
+    setListeAcik(acik)
+    try { localStorage.setItem('km-liste', acik ? 'acik' : 'kapali') } catch { /* yok say */ }
+  }
+
   const sinir: LatLngBoundsExpression = k.haritaSiniri
     ? [[k.haritaSiniri.y1, k.haritaSiniri.x1], [k.haritaSiniri.y2, k.haritaSiniri.x2]]
     : VARSAYILAN_SINIR
@@ -118,8 +139,8 @@ export default function Harita() {
   const t = KATMANLAR[katman]
 
   return (
-    <div className="harita-sayfa">
-      <AracListesi
+    <div className={'harita-sayfa' + (listeAcik ? '' : ' liste-kapali')}>
+      {listeAcik && <AracListesi
         araclar={araclar}
         gruplar={gruplar}
         grupId={grupId}
@@ -128,10 +149,13 @@ export default function Harita() {
         onSec={sec}
         durumFiltre={durumFiltre}
         onDurumFiltre={setDurumFiltre}
-      />
+        onKapat={() => listeyiAyarla(false)}
+      />}
 
       <div className="harita-alan">
-        <MapContainer bounds={sinir} className="harita" zoomControl={true}>
+        <MapContainer bounds={sinir} className="harita" zoomControl={false}>
+          <ZoomControl position="bottomright" />
+          <BoyutYenile anahtar={listeAcik} />
           <TileLayer key={katman} url={t.url} subdomains={[...t.sub]} maxZoom={20} attribution="Google" />
           <SinirAyarla araclar={araclar} />
           <SeciliyeGit arac={secili} istek={yaklasIstegi} takip={takip} />
@@ -145,6 +169,13 @@ export default function Harita() {
             />
           ))}
         </MapContainer>
+
+        {!listeAcik && (
+          <button className="liste-ac" onClick={() => listeyiAyarla(true)} title="Araç listesini göster">
+            <PanelLeftOpen size={18} />
+            Araçlar <span className="sayi">{araclar.length}</span>
+          </button>
+        )}
 
         <div className="katman-secici">
           {(Object.keys(KATMANLAR) as KatmanId[]).map(id => (
