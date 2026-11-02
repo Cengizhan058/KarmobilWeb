@@ -620,3 +620,35 @@ input { font: inherit; }
 
 .cizim-modu .leaflet-container { cursor: crosshair; }
 .islem-isaret { border: 2px solid #fff; border-radius: 50%; background: var(--vurgu); box-shadow: 0 0 0 1px rgba(0,0,0,.4); }
+
+/* ---------- Yönetim ekranları (araç, grup) ---------- */
+.yonetim-liste h3 { margin: 0 0 10px; font-size: 15px; font-weight: 500; }
+.islem-liste.uzun { max-height: none; }
+.arama-kutu { display: flex; align-items: center; gap: 6px; height: 36px; margin-bottom: 10px; padding: 0 10px; border: 1px solid var(--cizgi); border-radius: 8px; background: var(--yuzey); color: var(--soluk); }
+.arama-kutu input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--yazi); font: inherit; }
+.yonetim-icerik { overflow-y: auto; }
+.yonetim-form { max-width: 980px; padding: 18px 22px 30px; }
+.yonetim-form h2, .tek-sayfa h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font-size: 19px; font-weight: 500; }
+.yonetim-form fieldset { margin: 0 0 16px; padding: 12px 14px 2px; border: 1px solid var(--cizgi); border-radius: 10px; background: var(--yuzey); }
+.yonetim-form legend { padding: 0 6px; color: var(--yazi-2); font-weight: 500; }
+.yonetim-form .alan { margin-bottom: 12px; }
+.yonetim-form .secim:disabled { background: var(--yuzey-2); color: var(--soluk); }
+.izgara-4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0 14px; }
+.izgara-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0 14px; }
+.ikon-izgara.genis { grid-template-columns: repeat(auto-fill, 44px); }
+.ikon-izgara.genis img { max-width: 30px; max-height: 30px; }
+.belge-tablo { border-collapse: collapse; margin-bottom: 8px; }
+.belge-tablo th, .belge-tablo td { padding: 4px 8px 4px 0; text-align: left; font-weight: 500; }
+.belge-tablo thead th { color: var(--soluk); font-size: 12.5px; }
+.belge-tablo tbody th { color: var(--yazi-2); padding-right: 16px; white-space: nowrap; }
+.belge-tablo .secim { width: 170px; }
+.belge-tablo input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--vurgu); }
+.genislik-oto { width: auto; max-width: 320px; }
+.ana-dugme.genislik-oto { padding: 0 22px; }
+.grup-arac-ust { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+.grup-arac-ust .arama-kutu { flex: 1; margin: 0; }
+.grup-araclar { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0 12px; max-height: 360px; overflow-y: auto; padding: 4px 0; }
+.grup-araclar .onay-satir { margin-bottom: 6px; }
+.tek-sayfa { height: 100%; overflow-y: auto; padding: 18px 22px; background: var(--zemin); }
+.tek-sayfa .islem-baslik { margin-top: 0; }
+.tek-sayfa .tablo tbody tr { cursor: default; }

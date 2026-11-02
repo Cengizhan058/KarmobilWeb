@@ -162,6 +162,22 @@ export type HaritaKatmanlari = {
   rotalar: { id: number; ad: string; renk: string; noktalar: [number, number][] }[]
 }
 
+export type YonetimAraci = { id: number; cihazId: string; plaka: string; cihazTipi: string | null; ikon: number }
+
+/** Araç yönetimi formu. Tarihler yyyy-MM-dd; motor/lastik "kaç km sonra" (boş = değiştirme). */
+export type AracKaydiIstegi = {
+  plaka: string; aracSahibi: string | null; aracCinsi: string | null; aracMarkasi: string | null; aracTipi: string | null
+  surucu: string | null; aciklama: string | null; ikon: number
+  muayene1: string | null; muayene2: string | null; sigorta1: string | null; sigorta2: string | null
+  kasko1: string | null; kasko2: string | null; egzoz1: string | null; egzoz2: string | null
+  muayeneUyari: boolean; sigortaUyari: boolean; kaskoUyari: boolean; egzozUyari: boolean
+  kadranKm: number; motorKm: number | null; motorUyari: boolean; lastikKm: number | null; lastikUyari: boolean
+}
+export type AracKaydi = AracKaydiIstegi & { id: number; cihazId: string; gsm: string | null; cihazTipi: string | null; kadranTarihi: string | null }
+
+export type YonetimGrubu = { id: number; ad: string; ustId: number | null; araclar: number[] }
+export type ArizaliArac = { id: number; cihazId: string; plaka: string; sonSinyal: string | null; ilkSinyal: string | null; cihazTipi: string | null; aciklama: string | null }
+
 export class ApiHatasi extends Error {
   durum: number
   kod?: string
@@ -239,6 +255,16 @@ export const api = {
   sekilKaydet: (tur: 'bolgeler' | 'rotalar', id: number | null, s: { ad: string; renk: string; noktalar: [number, number][] | null }) =>
     istek<{ id?: number; mesaj: string }>(id ? `/api/${tur}/${id}` : `/api/${tur}`, { method: id ? 'PUT' : 'POST', body: JSON.stringify(s) }),
   sekilSil: (tur: 'bolgeler' | 'rotalar', id: number) => istek<{ mesaj: string }>(`/api/${tur}/${id}`, { method: 'DELETE' }),
+  // Araçlar menüsü: araç ve grup yönetimi
+  aracIkonlari: () => istek<{ no: number; ad: string }[]>('/api/yonetim/arac-ikonlari'),
+  yonetimAraclari: () => istek<YonetimAraci[]>('/api/yonetim/araclar'),
+  aracKaydi: (id: number) => istek<AracKaydi>(`/api/yonetim/araclar/${id}`),
+  aracKaydet: (id: number, k: AracKaydiIstegi) => istek<{ mesaj: string }>(`/api/yonetim/araclar/${id}`, { method: 'PUT', body: JSON.stringify(k) }),
+  yonetimGruplari: () => istek<YonetimGrubu[]>('/api/yonetim/gruplar'),
+  grupKaydet: (id: number | null, g: { ad: string; ustId: number | null; araclar: number[] }) =>
+    istek<{ id: number; mesaj: string }>(id ? `/api/yonetim/gruplar/${id}` : '/api/yonetim/gruplar', { method: id ? 'PUT' : 'POST', body: JSON.stringify(g) }),
+  grupSil: (id: number) => istek<{ mesaj: string }>(`/api/yonetim/gruplar/${id}`, { method: 'DELETE' }),
+  arizaliAraclar: () => istek<ArizaliArac[]>('/api/yonetim/arizali-araclar'),
   // Gerçek cihaza komut gönderir (cihazkomut tablosuna SK yazılır).
   anlikKonumIste: (id: number) => istek<{ mesaj: string }>(`/api/araclar/${id}/anlik-konum`, { method: 'POST' }),
 }

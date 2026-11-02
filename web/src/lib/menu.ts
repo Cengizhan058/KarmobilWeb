@@ -37,11 +37,11 @@ export const MENU: MenuMaddesi[] = [
   },
   {
     id: 'araclar', ad: 'Araçlar', ikon: Car, alt: [
-      { id: 'ay', ad: 'Araç Yönetimi', ikon: CarFront, goster: k => k.aracYonetimi },
-      { id: 'fy', ad: 'Grup Yönetimi', ikon: Users, goster: k => k.grupYonetimi },
+      { id: 'ay', ad: 'Araç Yönetimi', ikon: CarFront, goster: k => k.aracYonetimi, yol: '/arac-yonetimi' },
+      { id: 'fy', ad: 'Grup Yönetimi', ikon: Users, goster: k => k.grupYonetimi, yol: '/grup-yonetimi' },
       { id: 'fms_rb', ad: 'Ruhsat Bilgileri', ikon: IdCard, goster: k => k.aracYonetimi },
-      { id: 'arac_listesi', ad: 'Araç Listesi', ikon: List },
-      { id: 'pasifarizaaraclar', ad: 'Arızalı / Montajsız Araçlar', ikon: TriangleAlert },
+      { id: 'arac_listesi', ad: 'Araç Listesi', ikon: List, yol: '/?liste=1' },
+      { id: 'pasifarizaaraclar', ad: 'Arızalı / Montajsız Araçlar', ikon: TriangleAlert, yol: '/arizali-araclar' },
     ],
   },
   { id: 'dvrlist', ad: 'DVR-Kamera', ikon: Video },

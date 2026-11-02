@@ -29,4 +29,19 @@ GRANT INSERT, UPDATE, DELETE ON dbo.layers     TO [karmobil_web];
 GRANT INSERT, UPDATE, DELETE ON dbo.userpoints TO [karmobil_web];
 GRANT INSERT, UPDATE, DELETE ON dbo.regions    TO [karmobil_web];
 GRANT INSERT, UPDATE, DELETE ON dbo.routes     TO [karmobil_web];
+
+-- Araç yönetimi (yalnız eski formun alanları; CIHAZID/GSM/CIHAZTIPI yazılamaz)
+GRANT UPDATE ON dbo.clients (PLAKA, ARACSAHIBI, ARACCINSI, ARACMARKASI, ARACTIPI, SOFOR, EHLIYETNO, ICON,
+    MTARIH1, MTARIH2, STARIH1, STARIH2, KTARIH1, KTARIH2, ETARIH1, ETARIH2,
+    KADRAN_KM, KADRAN_KMTARIH, MOTOR_KM, LASTIK_KM) TO [karmobil_web];
+GRANT INSERT, DELETE ON dbo.uyarilar TO [karmobil_web];
+GRANT INSERT, UPDATE ON dbo.kadran TO [karmobil_web];
+
+-- Grup (filo) yönetimi
+GRANT INSERT, UPDATE, DELETE ON dbo.groups       TO [karmobil_web];
+GRANT INSERT, DELETE         ON dbo.groupmembers TO [karmobil_web];
 GO
+
+-- clients_update tetikleyicisi bazı durumlarda msdb.dbo.sp_send_dbmail ile e-posta gönderir
+-- (veritabanları arası sahiplik zinciri yok). Araç kaydı güncellemesi bu yüzden hata verirse:
+-- USE [msdb]; CREATE USER [karmobil_web] FOR LOGIN [karmobil_web]; ALTER ROLE [DatabaseMailUserRole] ADD MEMBER [karmobil_web];

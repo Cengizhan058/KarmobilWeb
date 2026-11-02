@@ -113,6 +113,7 @@ app.MapGecmis();
 app.MapRapor();
 app.MapKatman();
 app.MapIslem();
+app.MapYonetim();
 
 // ---------------------------------------------------------------------------
 // Arayüzün API ile birlikte sunulması (isteğe bağlı)

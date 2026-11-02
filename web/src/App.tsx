@@ -7,6 +7,9 @@ import YapimAsamasinda from './pages/YapimAsamasinda.tsx'
 import Gecmis from './pages/Gecmis.tsx'
 import Rapor from './pages/Rapor.tsx'
 import Islemler from './pages/Islemler.tsx'
+import AracYonetimi from './pages/AracYonetimi.tsx'
+import GrupYonetimi from './pages/GrupYonetimi.tsx'
+import ArizaliAraclar from './pages/ArizaliAraclar.tsx'
 
 export default function App() {
   return (
@@ -17,6 +20,9 @@ export default function App() {
         <Route path="gecmis" element={<Gecmis />} />
         <Route path="rapor/:kod" element={<Rapor />} />
         <Route path="islemler" element={<Islemler />} />
+        <Route path="arac-yonetimi" element={<AracYonetimi />} />
+        <Route path="grup-yonetimi" element={<GrupYonetimi />} />
+        <Route path="arizali-araclar" element={<ArizaliAraclar />} />
         <Route path="yapim/:id" element={<YapimAsamasinda />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

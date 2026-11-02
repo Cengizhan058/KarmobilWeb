@@ -132,6 +132,10 @@ export default function Harita() {
     try { localStorage.setItem('km-liste', acik ? 'acik' : 'kapali') } catch { /* yok say */ }
   }
 
+  // Menüdeki "Araç Listesi" (/?liste=1) listeyi açar; eski sitede de yalnız sol paneli genişletiyordu.
+  const listeIstegi = params.get('liste')
+  useEffect(() => { if (listeIstegi) listeyiAyarla(true) }, [listeIstegi])
+
   const sinir: LatLngBoundsExpression = k.haritaSiniri
     ? [[k.haritaSiniri.y1, k.haritaSiniri.x1], [k.haritaSiniri.y2, k.haritaSiniri.x2]]
     : VARSAYILAN_SINIR
