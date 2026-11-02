@@ -70,7 +70,12 @@ Cihazlar ──> Gateway ──> MSSQL (requests) <── eski ASP site / mobil 
   cihaz_durum alanına bakıyordu, fiilen çalışmıyordu; taşınmadı.
 - [x] 3. Geçmiş izleme: reportPosNewKadran(NoPoi) yordamı, hız renkli rota, duraklamalar (eşik seçilebilir), oynatma,
   liste (park gruplama), hız grafiği, Excel (CSV) ve Yazdır/PDF
-- [ ] 4. Raporlar
+- [x] 4. Raporlar: 21 rapor (genel IRapor altyapısı, /rapor/:kod sayfası). Demo hesabıyla hepsi hatasız çalıştı;
+  ısı / can-bus / rfid / POI / sürücü puanı demo hesabında veri olmadığı için 0 satır - gerçek veriyle denenmeli.
+  Açık: eski sitede DB'den dolan seçim listeleri (alarm türü, sürücü kimliği, nokta grubu/nokta, can-bus giriş türü,
+  bölge) şimdilik metin alanı; bazı yordamların dönüş kolon adları ve konumsal parametreleri eski ASP'den çıkarıldı.
+  İstisna: rapor SQL'leri Data/Sql.cs yerine her raporun kendi dosyasında (Raporlar/*.cs).
+- [ ] 5. İşlemler: harita katmanları (bölge / nokta / rota) görüntüleme yapıldı; ekleme/düzenleme kaldı
 
 ## Açık sorular
 - Gateway: nerede çalışıyor, hangi teknoloji, hangi tablolara yazıyor (`konumlar`, `clients`, `uyarilar`...)?

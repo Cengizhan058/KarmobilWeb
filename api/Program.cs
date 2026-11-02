@@ -101,6 +101,7 @@ app.MapAuth();
 app.MapArac();
 app.MapGecmis();
 app.MapRapor();
+app.MapKatman();
 
 // ---------------------------------------------------------------------------
 // Arayüzün API ile birlikte sunulması (isteğe bağlı)

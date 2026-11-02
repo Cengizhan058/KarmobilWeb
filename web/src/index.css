@@ -452,6 +452,33 @@ input { font: inherit; }
 .grafik-imlec { stroke: #d9534f; stroke-width: 1.5; }
 .grafik-bilgi { padding: 8px 2px 0; color: var(--yazi-2); }
 
+/* Kullanıcı katmanları (bölge / nokta / rota) */
+.katman-kutu { position: absolute; right: 12px; top: 58px; z-index: 600; }
+.katman-dugme {
+  display: flex; align-items: center; gap: 6px;
+  height: 34px; padding: 0 12px;
+  border: 1px solid var(--cizgi); border-radius: 9px;
+  background: var(--yuzey); color: var(--yazi-2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+}
+.katman-dugme:hover { color: var(--vurgu); border-color: var(--vurgu); }
+.katman-liste {
+  position: absolute; right: 0; top: 40px;
+  width: 280px; max-height: 60vh; overflow-y: auto;
+  padding: 8px 12px 12px;
+  background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: 10px; box-shadow: var(--golge);
+}
+.katman-liste-ust { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.katman-liste-ust .ikon-dugme { color: var(--soluk); }
+.katman-liste-ust .ikon-dugme:hover { background: var(--yuzey-2); }
+.katman-grup { padding: 8px 0; border-top: 1px solid var(--cizgi); }
+.katman-grup-baslik, .katman-oge { display: flex; align-items: center; gap: 8px; padding: 3px 0; cursor: pointer; }
+.katman-grup-baslik { font-weight: 500; }
+.katman-oge { padding-left: 22px; font-size: 13px; color: var(--yazi-2); }
+.katman-grup input, .katman-oge input { accent-color: var(--vurgu); }
+.katman-renk { flex: none; width: 10px; height: 10px; border-radius: 3px; }
+.katman-ad { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 /* Genel rapor sayfası */
 .coklu-secim { max-height: 220px; overflow-y: auto; margin-top: 6px; padding: 8px 10px; border: 1px solid var(--cizgi); border-radius: 8px; }
 .coklu-secim .onay-satir { margin-bottom: 6px; }

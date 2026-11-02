@@ -8,6 +8,7 @@ import { useKullanici } from '../components/Duzen.tsx'
 import AracKatmani from '../components/AracKatmani.tsx'
 import AracListesi from '../components/AracListesi.tsx'
 import AracBilgiPaneli from '../components/AracBilgiPaneli.tsx'
+import { KatmanCizimi, KatmanSecici, useKullaniciKatmanlari } from '../components/KullaniciKatmanlari.tsx'
 
 // Eski sitedeki Google katmanlarıyla aynı (index.asp tMapInit).
 const KATMANLAR = {
@@ -86,6 +87,7 @@ export default function Harita() {
   const [listeAcik, setListeAcik] = useState(listeTercihi)
   const [yaklasIstegi, setYaklasIstegi] = useState(0)
   const [turFiltre, setTurFiltre] = useState<TurFiltre>('hepsi')
+  const kullaniciKatman = useKullaniciKatmanlari()
 
   useEffect(() => { api.gruplar().then(setGruplar).catch(() => { /* grup yoksa seçim gizlenir */ }) }, [])
 
@@ -160,6 +162,7 @@ export default function Harita() {
           <TileLayer key={katman} url={t.url} subdomains={[...t.sub]} maxZoom={20} attribution="Google" />
           <SinirAyarla araclar={araclar} />
           <SeciliyeGit arac={secili} istek={yaklasIstegi} takip={takip} />
+          <KatmanCizimi veri={kullaniciKatman.veri} acik={kullaniciKatman.acik} />
           <AracKatmani araclar={gorunen} grupla={k.araclariGrupla} etiket={k.etiket} seciliId={seciliId} onSec={sec} />
         </MapContainer>
 
@@ -177,6 +180,8 @@ export default function Harita() {
             </button>
           ))}
         </div>
+
+        <KatmanSecici veri={kullaniciKatman.veri} acik={kullaniciKatman.acik} onDegis={kullaniciKatman.ayarla} />
 
         {hata && <div className="harita-uyari">{hata}</div>}
       </div>

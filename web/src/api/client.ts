@@ -153,6 +153,15 @@ export type RaporSonucu = {
   ozet: string | null
 }
 
+export type HaritaKatmanlari = {
+  bolgeler: { id: number; ad: string; renk: string; noktalar: [number, number][] }[]
+  katmanlar: {
+    id: number; ad: string; renk: string; ikon: string | null; boyut: number; paylasilan: boolean
+    noktalar: { id: number; baslik: string; aciklama: string | null; lat: number; lon: number; cap: number | null }[]
+  }[]
+  rotalar: { id: number; ad: string; renk: string; noktalar: [number, number][] }[]
+}
+
 export class ApiHatasi extends Error {
   durum: number
   kod?: string
@@ -215,6 +224,7 @@ export const api = {
   gorunumKaydet: (ayar: GorunumAyari) => istek<void>('/api/ayarlar/gorunum', { method: 'PUT', body: JSON.stringify(ayar) }),
   gecmis: (aracId: number, baslangic: string, bitis: string, poi: boolean) =>
     istek<Gecmis>(`/api/gecmis?aracId=${aracId}&baslangic=${encodeURIComponent(baslangic)}&bitis=${encodeURIComponent(bitis)}&poi=${poi}`),
+  haritaKatmanlari: () => istek<HaritaKatmanlari>('/api/harita-katmanlari'),
   raporlar: () => istek<RaporTanimi[]>('/api/raporlar'),
   rapor: (kod: string, sorgu: URLSearchParams) => istek<RaporSonucu>(`/api/raporlar/${kod}?${sorgu}`),
   aracDetay: (id: number) => istek<AracDetay>(`/api/araclar/${id}/detay`),
