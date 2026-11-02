@@ -10,6 +10,9 @@ import Islemler from './pages/Islemler.tsx'
 import AracYonetimi from './pages/AracYonetimi.tsx'
 import GrupYonetimi from './pages/GrupYonetimi.tsx'
 import ArizaliAraclar from './pages/ArizaliAraclar.tsx'
+import Ruhsat from './pages/Ruhsat.tsx'
+import MesaiSaatleri from './pages/MesaiSaatleri.tsx'
+import RfidKartlari from './pages/RfidKartlari.tsx'
 
 export default function App() {
   return (
@@ -23,6 +26,9 @@ export default function App() {
         <Route path="arac-yonetimi" element={<AracYonetimi />} />
         <Route path="grup-yonetimi" element={<GrupYonetimi />} />
         <Route path="arizali-araclar" element={<ArizaliAraclar />} />
+        <Route path="ruhsat" element={<Ruhsat />} />
+        <Route path="mesai-saatleri" element={<MesaiSaatleri />} />
+        <Route path="rfid" element={<RfidKartlari />} />
         <Route path="yapim/:id" element={<YapimAsamasinda />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

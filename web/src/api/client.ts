@@ -178,6 +178,8 @@ export type AracKaydi = AracKaydiIstegi & { id: number; cihazId: string; gsm: st
 export type YonetimGrubu = { id: number; ad: string; ustId: number | null; araclar: number[] }
 export type ArizaliArac = { id: number; cihazId: string; plaka: string; sonSinyal: string | null; ilkSinyal: string | null; cihazTipi: string | null; aciklama: string | null }
 
+export type RfidKart = { id: number; kartNo: string; adSoyad: string | null; ehliyetNo: string | null; gsmNo: string | null; kayitTarihi: string | null }
+
 export class ApiHatasi extends Error {
   durum: number
   kod?: string
@@ -265,6 +267,15 @@ export const api = {
     istek<{ id: number; mesaj: string }>(id ? `/api/yonetim/gruplar/${id}` : '/api/yonetim/gruplar', { method: id ? 'PUT' : 'POST', body: JSON.stringify(g) }),
   grupSil: (id: number) => istek<{ mesaj: string }>(`/api/yonetim/gruplar/${id}`, { method: 'DELETE' }),
   arizaliAraclar: () => istek<ArizaliArac[]>('/api/yonetim/arizali-araclar'),
+  // Ayarlar: ruhsat, mesai saatleri, RF-ID kartları
+  ruhsatAlanlari: () => istek<{ ad: string; baslik: string; uz: number }[]>('/api/ayarlar/ruhsat-alanlari'),
+  ruhsat: (id: number) => istek<{ plaka: string | null; alanlar: Record<string, string> }>(`/api/ayarlar/ruhsat/${id}`),
+  ruhsatKaydet: (id: number, alanlar: Record<string, string>) => istek<{ mesaj: string }>(`/api/ayarlar/ruhsat/${id}`, { method: 'PUT', body: JSON.stringify(alanlar) }),
+  /** 14 değer: Pazartesi başlangıç, bitiş, Salı ..., Pazar bitiş; "-" = mesai yok. */
+  mesai: (id: number) => istek<string[]>(`/api/ayarlar/mesai/${id}`),
+  mesaiKaydet: (araclar: number[], saatler: string[]) => istek<{ mesaj: string }>('/api/ayarlar/mesai', { method: 'PUT', body: JSON.stringify({ araclar, saatler }) }),
+  rfidKartlari: () => istek<RfidKart[]>('/api/ayarlar/rfid'),
+  rfidKaydet: (id: number, k: { adSoyad: string; ehliyetNo: string; gsmNo: string }) => istek<{ mesaj: string }>(`/api/ayarlar/rfid/${id}`, { method: 'PUT', body: JSON.stringify(k) }),
   // Gerçek cihaza komut gönderir (cihazkomut tablosuna SK yazılır).
   anlikKonumIste: (id: number) => istek<{ mesaj: string }>(`/api/araclar/${id}/anlik-konum`, { method: 'POST' }),
 }

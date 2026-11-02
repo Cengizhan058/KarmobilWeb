@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { CarFront, Save, Search } from 'lucide-react'
+import { CarFront, Save } from 'lucide-react'
 import { api, type AracKaydi, type YonetimAraci } from '../api/client.ts'
+import AracSecimListesi from '../components/AracSecimListesi.tsx'
 
 type Mesaj = { tur: 'ok' | 'hata'; metin: string } | null
 
@@ -18,7 +19,6 @@ export default function AracYonetimi() {
   const [params, setParams] = useSearchParams()
   const [araclar, setAraclar] = useState<YonetimAraci[]>([])
   const [ikonlar, setIkonlar] = useState<{ no: number; ad: string }[]>([])
-  const [ara, setAra] = useState('')
   const [kayit, setKayit] = useState<AracKaydi | null>(null)
   const [mesaj, setMesaj] = useState<Mesaj>(null)
   const [mesgul, setMesgul] = useState(false)
@@ -34,11 +34,6 @@ export default function AracYonetimi() {
     if (!seciliId) return
     api.aracKaydi(seciliId).then(setKayit).catch(e => setMesaj({ tur: 'hata', metin: e.message }))
   }, [seciliId])
-
-  const liste = useMemo(() => {
-    const q = ara.trim().toLocaleUpperCase('tr-TR')
-    return q ? araclar.filter(a => a.plaka.toLocaleUpperCase('tr-TR').includes(q) || a.cihazId.includes(q)) : araclar
-  }, [araclar, ara])
 
   const alan = <K extends keyof AracKaydi>(ad: K, deger: AracKaydi[K]) => setKayit(k => (k ? { ...k, [ad]: deger } : k))
 
@@ -61,19 +56,7 @@ export default function AracYonetimi() {
 
   return (
     <div className="gecmis-sayfa">
-      <aside className="gecmis-form yonetim-liste">
-        <h3>Kayıtlı araçlar</h3>
-        <label className="arama-kutu"><Search size={15} /><input placeholder="Plaka ya da cihaz ID" value={ara} onChange={e => setAra(e.target.value)} /></label>
-        <ul className="islem-liste uzun">
-          {liste.map(a => (
-            <li key={a.id} className={a.id === seciliId ? 'secili' : ''} onClick={() => { setMesaj(null); setParams({ arac: String(a.id) }) }}>
-              <img src={`/arac-ico/b-${a.ikon}.png`} alt="" />
-              <span>{a.plaka}</span><small>{a.cihazId}</small>
-            </li>
-          ))}
-          {!liste.length && <li className="bos">Araç bulunamadı.</li>}
-        </ul>
-      </aside>
+      <AracSecimListesi baslik="Kayıtlı araçlar" araclar={araclar} seciliId={seciliId} onSec={id => { setMesaj(null); setParams({ arac: String(id) }) }} />
 
       <section className="gecmis-icerik yonetim-icerik">
         {!kayit ? (

@@ -39,7 +39,7 @@ export const MENU: MenuMaddesi[] = [
     id: 'araclar', ad: 'Araçlar', ikon: Car, alt: [
       { id: 'ay', ad: 'Araç Yönetimi', ikon: CarFront, goster: k => k.aracYonetimi, yol: '/arac-yonetimi' },
       { id: 'fy', ad: 'Grup Yönetimi', ikon: Users, goster: k => k.grupYonetimi, yol: '/grup-yonetimi' },
-      { id: 'fms_rb', ad: 'Ruhsat Bilgileri', ikon: IdCard, goster: k => k.aracYonetimi },
+      { id: 'fms_rb', ad: 'Ruhsat Bilgileri', ikon: IdCard, goster: k => k.aracYonetimi, yol: '/ruhsat' },
       { id: 'arac_listesi', ad: 'Araç Listesi', ikon: List, yol: '/?liste=1' },
       { id: 'pasifarizaaraclar', ad: 'Arızalı / Montajsız Araçlar', ikon: TriangleAlert, yol: '/arizali-araclar' },
     ],
@@ -49,8 +49,8 @@ export const MENU: MenuMaddesi[] = [
     id: 'ayarlar', ad: 'Ayarlar', ikon: Settings, alt: [
       { id: 'pwd_settings', ad: 'Şifre / Parola Ayarları', ikon: KeyRound, goster: k => k.kullaniciAyarlari },
       { id: 'sub_users', ad: 'Kullanıcı Yetkilendirme', ikon: ShieldCheck, goster: k => k.kullaniciAyarlari && k.altKullaniciLimiti > 0 },
-      { id: 'rfid_management', ad: 'RF-ID Kart Yönetimi', ikon: BadgeCheck },
-      { id: 'work_hours', ad: 'Mesai Saatleri', ikon: Clock },
+      { id: 'rfid_management', ad: 'RF-ID Kart Yönetimi', ikon: BadgeCheck, yol: '/rfid' },
+      { id: 'work_hours', ad: 'Mesai Saatleri', ikon: Clock, yol: '/mesai-saatleri' },
       { id: 'smart_block', ad: 'Akıllı Motor Blokaj', ikon: Ban, goster: k => k.akilliBlokaj },
       { id: 'alarm_settings', ad: 'Bildirim Ayarları', ikon: Bell },
       { id: 'device_settings', ad: 'Cihaz Programlama', ikon: Cpu, goster: k => k.cihazProgramlama },

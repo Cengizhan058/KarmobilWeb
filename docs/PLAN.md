@@ -76,9 +76,8 @@ Cihazlar ──> Gateway ──> MSSQL (requests) <── eski ASP site / mobil 
   bölge) şimdilik metin alanı; bazı yordamların dönüş kolon adları ve konumsal parametreleri eski ASP'den çıkarıldı.
   İstisna: rapor SQL'leri Data/Sql.cs yerine her raporun kendi dosyasında (Raporlar/*.cs).
 - [x] 5. İşlemler: /islemler ekranı (nokta grupları + POI, bölgeler, rotalar: ekle/düzenle/sil, haritaya tıklayarak çizim). Yazmalar yalnız kullanıcının kendi kayıtlarına; eski sitedeki iki sahiplik açığı (katman silerken başkasının noktaları, sahibi denetlenmeyen nokta ekleme) kapatıldı. Fark: eski rota ekranı yol takibi (routing) yapıyordu, yeni ekranda rota tıklanan noktalar arası düz çizgi; rota şekli eskisi gibi sonradan değiştirilemez (yalnız ad/renk).
+- [ ] 6. Araçlar / Ayarlar: araç yönetimi (/arac-yonetimi), grup yönetimi (/grup-yonetimi), araç listesi (haritadaki listeyi açar), arızalı/montajsız (/arizali-araclar) yapıldı. Araç kaydetme gerçek veriyle henüz denenmedi (kullanıcıyla birlikte); grup ekle/güncelle/sil demo hesabında denendi. Not: clients_update tetikleyicisi her güncellemede çalışır (eski sitede de aynı). Ruhsat (/ruhsat; eski uçta sahiplik denetimi yoktu, kapatıldı), mesai saatleri (/mesai-saatleri, seçilen araçlara toplu), RF-ID kartları (/rfid) yapıldı; yazmaları gerçek veriyle denenmedi. Şifre değiştirme bekliyor: eski sitede veritabanına hiç yazmıyordu (yalnız oturumu değiştiriyordu); users.PASSWORD yazılması kullanıcı kararı. Kalan: bildirim ayarları, aktif bildirimler, kullanıcı yetkilendirme, cihaz programlama, motor blokaj.
 
 ## Açık sorular
 - Gateway: nerede çalışıyor, hangi teknoloji, hangi tablolara yazıyor (`konumlar`, `clients`, `uyarilar`...)?
-- Canlı sunucunun Windows sürümü (.NET 9 Hosting Bundle uyumu) ve IIS erişimi.
 - KarmobilRN deposunun GitHub erişimi (API istemcisi ve tipler tekrar kullanılabilir).
-- Yeni GitHub deposunun adı/sahibi (ör. MhAliCakmakBelsoft/KarmobilWeb).

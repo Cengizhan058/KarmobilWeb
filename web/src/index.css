@@ -652,3 +652,9 @@ input { font: inherit; }
 .tek-sayfa { height: 100%; overflow-y: auto; padding: 18px 22px; background: var(--zemin); }
 .tek-sayfa .islem-baslik { margin-top: 0; }
 .tek-sayfa .tablo tbody tr { cursor: default; }
+.alan.tam-satir { grid-column: 1 / -1; }
+.arama-kutu.dar { width: 260px; margin: 0; }
+.tablo.duzenlenebilir td { padding: 5px 8px; }
+.tablo.duzenlenebilir .secim { height: 32px; min-width: 140px; }
+.tablo.duzenlenebilir .ikincil-dugme { display: inline-flex; align-items: center; gap: 4px; }
+.yonetim-liste .islem-liste input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--vurgu); }
