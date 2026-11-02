@@ -98,6 +98,7 @@ app.MapGet("/api/health", async (SqlDb db, CancellationToken ct) =>
 .WithTags("Sistem");
 
 app.MapAuth();
+app.MapArac();
 
 // ---------------------------------------------------------------------------
 // Arayüzün API ile birlikte sunulması (isteğe bağlı)

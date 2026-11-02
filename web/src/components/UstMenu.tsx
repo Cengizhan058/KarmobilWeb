@@ -30,7 +30,9 @@ export default function UstMenu({ kullanici }: { kullanici: OturumKullanici }) {
     navigate('/giris', { replace: true })
   }
 
-  const ad = kullanici.adSoyad?.trim() || kullanici.kullaniciAdi
+  // ADI_SOYADI çoğu kayıtta boş ya da "-"; o durumda kullanıcı adı gösterilir.
+  const adSoyad = kullanici.adSoyad?.trim()
+  const ad = adSoyad && adSoyad !== '-' ? adSoyad : kullanici.kullaniciAdi
   const basHarf = ad.slice(0, 2).toLocaleUpperCase('tr-TR')
 
   return (

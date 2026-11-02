@@ -32,6 +32,35 @@ export type Bayi = {
   destekWeb: string | null
 }
 
+export type AracDurumu = 'Hareketli' | 'Rolanti' | 'Park' | 'VeriYok'
+
+export type AracKonum = {
+  id: number
+  cihazId: string
+  plaka: string
+  durum: AracDurumu
+  kontak: boolean
+  lat: number | null
+  lon: number | null
+  hiz: number
+  yon: number
+  gpsHatasi: boolean
+  batarya: string | null
+  isi: string | null
+  surucu: string | null
+  gpsTarihi: string | null
+  sinyalTarihi: string | null
+  adres: string | null
+  cihazTipi: string | null
+  grupIdleri: number[]
+  dvr: boolean
+  motorBlokeli: boolean
+  gunlukKm: number | null
+  kadranKm: number | null
+}
+
+export type Grup = { id: number; ad: string; ustId: number | null }
+
 export class ApiHatasi extends Error {
   durum: number
   kod?: string
@@ -88,4 +117,6 @@ export const api = {
     istek<{ token: string }>('/api/auth/login', { method: 'POST', body: JSON.stringify({ kullaniciAdi, sifre }) }),
   ben: () => istek<OturumKullanici>('/api/auth/ben'),
   bayi: () => istek<Bayi>('/api/bayi'),
+  araclar: (grupId?: number | null) => istek<AracKonum[]>('/api/araclar' + (grupId ? `?grupId=${grupId}` : '')),
+  gruplar: () => istek<Grup[]>('/api/gruplar'),
 }
