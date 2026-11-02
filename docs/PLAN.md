@@ -19,7 +19,13 @@ Tarih: 2026-11-02. Eski site: takip.karmobil.com (Classic ASP, dhtmlx 5.1, Leafl
 - Araç cihazlarından gelen veriyi tablolara yazan ayrı bir **gateway** var (ayrıntısı bekleniyor).
 
 ## Veritabanı: değiştirelim mi?
-**Öneri: motoru değiştirmeyelim (MSSQL kalsın), sürümü ayrı bir işte yükseltelim.**
+**Karar (2026-11-02): PostgreSQL'e taşınacak, ama EN SONDA ayrı aşama olarak** (aşama 10).
+Ön koşullar: yeni API tüm ekranları karşılamış olacak, mobil uygulama (KarmobilRN) eski ASP uçlarından yeni API'ye
+geçmiş olacak, gateway (BiosXE5TCP / BiosUDP_XE5v26, Delphi) kaynak kodu alınıp PostgreSQL'e yazacak şekilde
+güncellenecek. O zamana kadar yeni API MSSQL üzerinde geliştirilir; **tüm SQL `api/Data/Sql.cs` içinde tutulur**
+(T-SQL'e özgü yapılar: `WITH (NOLOCK)`, `TOP`, `dbo.` fonksiyonları, `ISNULL`, `DATEDIFF` - taşımada buradan çevrilir).
+
+Önceki değerlendirme (bilgi için):
 
 - Gateway, mobil uygulama, eski site ve 169 prosedür aynı MSSQL'e bağlı. Motor değişirse (Oracle/PostgreSQL) gateway yeniden
   yazılır, 146 milyon konum satırı taşınır, prosedürler çevrilir. Arayüz yenilemesine katkısı yok, riski çok yüksek.
@@ -53,6 +59,14 @@ Cihazlar ──> Gateway ──> MSSQL (requests) <── eski ASP site / mobil 
 7. **Gider yönetimi (FMS)**: sigorta, yakıt, muayene, bakım, lastik, ceza, kaza, MTV, OGS/HGS, genel masraf + raporlar.
 8. **Diğer**: göstergeler (dashboard), mesajlar, DVR-kamera, destek, admin paneli (`admins/`).
 9. **Yayın**: sunucu kurulumu, paralel çalıştırma, kullanıcı geçişi.
+10. **PostgreSQL'e taşıma**: mobil uygulamanın yeni API'ye geçişi, gateway güncellemesi, 169 prosedür/fonksiyonun
+    PL/pgSQL'e çevrilmesi, `konumlar` (~146 milyon satır) tarih bölümlemeli taşınması, Sql.cs'in çevrilmesi.
+
+## İlerleme
+- [x] 1. İskelet (giriş, tema, menü, harita) - 9fbec00
+- [x] 2. Araç listesi + canlı konum - db1e65b; araç bilgi paneli - cf64a96
+- [ ] 2. kalan: haritada gruplama (cluster), filtre ağacı (GPS verisi / cihaz türü / araç durumu), görünüm ayarları
+- [ ] 3. Geçmiş izleme
 
 ## Açık sorular
 - Gateway: nerede çalışıyor, hangi teknoloji, hangi tablolara yazıyor (`konumlar`, `clients`, `uyarilar`...)?
