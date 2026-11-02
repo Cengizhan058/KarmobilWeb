@@ -1,0 +1,16 @@
+﻿# .NET
+bin/
+obj/
+*.user
+appsettings.Development.json
+appsettings.Production.json
+
+# Node / Vite
+node_modules/
+dist/
+.env
+.env.local
+
+# Editör
+.vs/
+.vscode/
