@@ -1,0 +1,20 @@
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
+import '@fontsource/roboto/latin-ext-400.css'
+import '@fontsource/roboto/latin-ext-500.css'
+import '@fontsource/roboto/latin-ext-700.css'
+import '@fontsource/roboto/latin-400.css'
+import '@fontsource/roboto/latin-500.css'
+import '@fontsource/roboto/latin-700.css'
+import 'leaflet/dist/leaflet.css'
+import App from './App.tsx'
+import './index.css'
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </StrictMode>,
+)
