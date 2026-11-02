@@ -58,7 +58,7 @@ Cihazlar ──> Gateway ──> MSSQL (requests) <── eski ASP site / mobil 
    cihaz programlama, motor blokajı, aktif bildirimler.
 7. **Gider yönetimi (FMS)**: sigorta, yakıt, muayene, bakım, lastik, ceza, kaza, MTV, OGS/HGS, genel masraf + raporlar.
 8. **Diğer**: göstergeler (dashboard), mesajlar, DVR-kamera, destek, admin paneli (`admins/`).
-9. **Yayın**: sunucu kurulumu, paralel çalıştırma, kullanıcı geçişi.
+9. **Yayın**: sunucu kurulumu, paralel çalıştırma, kullanıcı geçişi. Geçici kurulum mevcut Windows Server 2012 + IIS 8 üzerine .NET 9 ile (yayin/KURULUM.md, paketle.ps1, sql-kullanici.sql); geliştirme bitince yeni sunucuya + .NET 10 LTS.
 10. **PostgreSQL'e taşıma**: mobil uygulamanın yeni API'ye geçişi, gateway güncellemesi, 169 prosedür/fonksiyonun
     PL/pgSQL'e çevrilmesi, `konumlar` (~146 milyon satır) tarih bölümlemeli taşınması, Sql.cs'in çevrilmesi.
 

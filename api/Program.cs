@@ -10,6 +10,16 @@ builder.Services.AddSingleton<SqlDb>();
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<OturumServisi>();
 
+// Üretimde anahtar ve bağlantı zorunlu: appsettings.json'daki geliştirme anahtarı depoda açık durur.
+if (!builder.Environment.IsDevelopment())
+{
+    var anahtar = builder.Configuration["Auth:SecretKey"] ?? "";
+    if (anahtar.Length < 32 || anahtar.Contains("yerel-gelistirme"))
+        throw new InvalidOperationException("Auth:SecretKey üretim için ayarlanmamış (appsettings.Production.json, en az 32 karakter).");
+    if (string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("Karmobil")))
+        throw new InvalidOperationException("ConnectionStrings:Karmobil ayarlanmamış (appsettings.Production.json).");
+}
+
 var authKey = AuthKey.Olustur(builder.Configuration);
 builder.Services.AddSingleton(authKey);
 
@@ -77,7 +87,7 @@ app.UseExceptionHandler(handler => handler.Run(async context =>
     });
 }));
 
-// Bağlantı sağlığı. Bu aşamada API veritabanına yazmaz: readOnly=true.
+// Bağlantı sağlığı (kimlik doğrulamasız). Sunucu/veritabanı adı yalnız geliştirmede gösterilir.
 app.MapGet("/api/health", async (SqlDb db, CancellationToken ct) =>
 {
     if (!db.Yapilandirilmis)
@@ -85,15 +95,15 @@ app.MapGet("/api/health", async (SqlDb db, CancellationToken ct) =>
         return Results.Json(new
         {
             status = "yapilandirilmamis",
-            error = "Veritabanı bağlantısı girilmemiş (ConnectionStrings:Karmobil). Bkz. README.md.",
-            readOnly = true
+            error = "Veritabanı bağlantısı girilmemiş (ConnectionStrings:Karmobil). Bkz. README.md."
         }, statusCode: StatusCodes.Status503ServiceUnavailable);
     }
 
     var ok = await db.PingAsync(ct);
+    var hedef = app.Environment.IsDevelopment() ? db.Target : null;
     return ok
-        ? Results.Ok(new { status = "ok", target = db.Target, readOnly = true })
-        : Results.Problem($"Veritabanına bağlanılamadı: {db.Target}", statusCode: 503);
+        ? Results.Ok(new { status = "ok", target = hedef })
+        : Results.Problem("Veritabanına bağlanılamadı." + (hedef is null ? "" : $" ({hedef})"), statusCode: 503);
 })
 .WithTags("Sistem");
 
