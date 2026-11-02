@@ -21,9 +21,33 @@ public static class RaporEndpoints
         ORDER BY c.PLAKA
         """;
 
+    // Seçim listeleri (eski _forms_raporX.asp'lerdeki DB'den dolan select'ler). Hepsi kullanıcıya göre süzülür.
+    private const string KatmanKosulu = "(l.USERID = @kullaniciId OR (l.SUBUSERS = 1 AND l.USERID = (SELECT GROUPID FROM users WITH (NOLOCK) WHERE ID = @kullaniciId)))";
+    private static readonly Dictionary<string, string> SecenekSorgulari = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["alarmTurleri"] = "SELECT RAPORKODU AS DEGER, RAPORADI AS AD FROM raportanim WITH (NOLOCK) ORDER BY RAPORADI",
+        ["suruculer"] = "SELECT KIMLIKID AS DEGER, ADSOYAD AS AD FROM surucukimlik WITH (NOLOCK) WHERE USERID = @kullaniciId ORDER BY ADSOYAD",
+        ["canbusGirisleri"] = "SELECT KOMUT AS DEGER, TITLE AS AD FROM canbusinputs WITH (NOLOCK) ORDER BY TITLE",
+        ["bolgeler"] = "SELECT ID AS DEGER, REGION_NAME AS AD FROM regions WITH (NOLOCK) WHERE USERID = @kullaniciId ORDER BY REGION_NAME",
+        ["gruplar"] = "SELECT ID AS DEGER, GROUPNAME AS AD FROM groups WITH (NOLOCK) WHERE USERID = @kullaniciId ORDER BY GROUPNAME",
+        ["katmanlar"] = $"SELECT l.ID AS DEGER, l.LAYERNAME AS AD FROM layers l WITH (NOLOCK) WHERE {KatmanKosulu} ORDER BY l.LAYERNAME",
+        ["noktalar"] = $"SELECT u.ID AS DEGER, CONCAT(l.LAYERNAME, ' / ', u.TITLE) AS AD FROM userpoints u WITH (NOLOCK) JOIN layers l WITH (NOLOCK) ON l.ID = u.LAYERID WHERE {KatmanKosulu} ORDER BY l.LAYERNAME, u.TITLE",
+    };
+
     public static void MapRapor(this IEndpointRouteBuilder app)
     {
         var grup = app.MapGroup("/api/raporlar").WithTags("Raporlar").RequireAuthorization();
+
+        grup.MapGet("/secenekler/{kaynak}", async (string kaynak, HttpContext http, OturumServisi oturum, SqlDb db, CancellationToken ct) =>
+        {
+            var k = await oturum.KullaniciAlAsync(http.User, ct);
+            if (k is null) return Results.Unauthorized();
+            if (!SecenekSorgulari.TryGetValue(kaynak, out var sql)) return Results.NotFound(new { error = "Bilinmeyen seçenek kaynağı." });
+            var satirlar = await db.SorguAsync(sql, new Dictionary<string, object?> { ["kullaniciId"] = k.Id }, ct);
+            return Results.Ok(satirlar
+                .Select(s => new RaporSecenek((s["DEGER"]?.ToString() ?? "").Trim(), RaporYardimci.Metin(s["AD"]) ?? ""))
+                .Where(s => s.Deger.Length > 0));
+        });
 
         grup.MapGet("", async (HttpContext http, OturumServisi oturum, CancellationToken ct) =>
         {

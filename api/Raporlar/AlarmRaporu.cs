@@ -6,8 +6,8 @@ namespace Karmobil.Api.Raporlar;
 /// Alarm/İhlal raporu (eski: data/_raporAlarm.asp, _forms_raporAlarm.asp, report_alarm()).
 /// reportAlarm yordamının kayıtları listelenir; hız 6'nın altındaysa 0 yazılır, ısı 999 ise boş bırakılır,
 /// G1/G2 rapor kodları "Kontak Kapandı"/"Kontak Açıldı" olarak adlandırılır. En fazla 31 gün.
-/// Eski formda araç ya tek araç ya da "Hepsi" seçilebiliyordu; tek araçta yordama cihaz kimliği,
-/// birden çok araçta 'all' geçilir ve sonuç seçilen araçlarla süzülür (eski "Hepsi" davranışı).
+/// Eski formda araç ya tek araç ya da "Hepsi" seçilebiliyordu; burada yordam seçilen her araç için
+/// cihaz kimliğiyle ayrı çağrılır (yordam 'all' ile kayıt döndürmüyor).
 /// </summary>
 public sealed class AlarmRaporu : IRapor
 {
@@ -22,7 +22,7 @@ public sealed class AlarmRaporu : IRapor
 
     // Eski formda seçenekler raportanim tablosundan (RAPORKODU/RAPORADI) doluyordu; "all" = Hepsi.
     public IReadOnlyList<RaporParametre> Parametreler { get; } =
-        [new RaporParametre("alarms", "Alarm/İhlal türü (rapor kodu, all = hepsi)", "metin", "all")];
+        [new RaporParametre("alarms", "Alarm / ihlal türü", "secim", "all", [new RaporSecenek("all", "Hepsi")], Kaynak: "alarmTurleri")];
 
     public async Task<RaporSonuc> CalistirAsync(RaporIstegi istek, SqlDb db, CancellationToken ct)
     {
@@ -36,16 +36,21 @@ public sealed class AlarmRaporu : IRapor
                 "Birden çok araç için yalnızca bir alarm türüne göre sorgulama yapabilirsiniz.");
         }
 
-        var kayitlar = await db.SorguAsync(Sorgu, new Dictionary<string, object?>
+        // Yordam 'all' ile çağrılınca kayıt dönmüyor (demo hesabıyla denendi); her araç için ayrı çağrılıp tarihe göre birleştirilir.
+        var kayitlar = new List<Dictionary<string, object?>>();
+        foreach (var arac in istek.Araclar)
         {
-            ["kullaniciId"] = istek.Kullanici.Id,
-            ["cihazId"] = cokArac ? "all" : istek.Araclar[0].CihazId,
-            ["raporKodu"] = raporKodu,
-            ["t1"] = RaporIstegi.SqlTarih(istek.Baslangic!.Value),
-            ["t2"] = RaporIstegi.SqlTarih(istek.Bitis!.Value),
-        }, ct);
+            kayitlar.AddRange(await db.SorguAsync(Sorgu, new Dictionary<string, object?>
+            {
+                ["kullaniciId"] = istek.Kullanici.Id,
+                ["cihazId"] = arac.CihazId,
+                ["raporKodu"] = raporKodu,
+                ["t1"] = RaporIstegi.SqlTarih(istek.Baslangic!.Value),
+                ["t2"] = RaporIstegi.SqlTarih(istek.Bitis!.Value),
+            }, ct));
+        }
+        if (cokArac) kayitlar = kayitlar.OrderBy(k => k.GetValueOrDefault("TARIH") as DateTime? ?? DateTime.MinValue).ToList();
 
-        var secilen = istek.Araclar.Select(a => a.CihazId).ToHashSet(StringComparer.OrdinalIgnoreCase);
         var plakalar = istek.Araclar.GroupBy(a => a.CihazId, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(g => g.Key, g => g.First().Plaka, StringComparer.OrdinalIgnoreCase);
 
@@ -53,7 +58,6 @@ public sealed class AlarmRaporu : IRapor
         foreach (var k in kayitlar)
         {
             var cihazId = (Convert.ToString(k.GetValueOrDefault("CIHAZID"), System.Globalization.CultureInfo.InvariantCulture) ?? "").Trim();
-            if (cokArac && !secilen.Contains(cihazId)) continue;
 
             var raporkodu = (k.GetValueOrDefault("RAPORKODU") as string ?? "").Trim();
             var alarm = raporkodu switch

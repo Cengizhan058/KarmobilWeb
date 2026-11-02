@@ -46,8 +46,8 @@ public sealed class NoktaRaporu : IRapor
 
     public IReadOnlyList<RaporParametre> Parametreler { get; } =
     [
-        new RaporParametre("layer", "Nokta grubu", "metin", "all"),
-        new RaporParametre("poi", "Nokta", "metin", "all"),
+        new RaporParametre("layer", "Nokta grubu", "secim", "all", [new RaporSecenek("all", "Hepsi")], Kaynak: "katmanlar"),
+        new RaporParametre("poi", "Nokta", "secim", "all", [new RaporSecenek("all", "Hepsi")], Kaynak: "noktalar"),
     ];
 
     private sealed record Nokta(double X, double Y, string? Ad);

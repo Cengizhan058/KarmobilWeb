@@ -43,7 +43,7 @@ public sealed class SonKonumRaporu : IRapor
             new RaporSecenek("rolanti", "Rölanti"),
             new RaporSecenek("veri_yok", "Veri Yok"),
         ]),
-        new RaporParametre("groupId", "Filo", "metin", "all"),
+        new RaporParametre("groupId", "Filo", "secim", "all", [new RaporSecenek("all", "Hepsi")], Kaynak: "gruplar"),
     ];
 
     public async Task<RaporSonuc> CalistirAsync(RaporIstegi istek, SqlDb db, CancellationToken ct)

@@ -20,7 +20,7 @@ public sealed class KimlikRaporu : IRapor
 
     // Eski formdaki seçenekler kullanıcının surucukimlik kayıtlarından (KIMLIKID/ADSOYAD) gelir; "all" = hepsi.
     public IReadOnlyList<RaporParametre> Parametreler { get; } =
-        [new RaporParametre("kimlik_id", "Kimlik", "metin", "all")];
+        [new RaporParametre("kimlik_id", "Görevli / kimlik", "secim", "all", [new RaporSecenek("all", "Hepsi")], Kaynak: "suruculer")];
 
     public async Task<RaporSonuc> CalistirAsync(RaporIstegi istek, SqlDb db, CancellationToken ct)
     {

@@ -37,7 +37,7 @@ public sealed class CanbusRaporu : IRapor
 
     // Eski formdaki seçenekler canbusinputs tablosundan (KOMUT/TITLE) gelir; boş ya da "all" = tüm girişler.
     public IReadOnlyList<RaporParametre> Parametreler { get; } =
-        [new RaporParametre("gtip", "Giriş Tipi", "metin")];
+        [new RaporParametre("gtip", "Giriş tipi", "secim", "all", [new RaporSecenek("all", "Hepsi")], Kaynak: "canbusGirisleri")];
 
     public async Task<RaporSonuc> CalistirAsync(RaporIstegi istek, SqlDb db, CancellationToken ct)
     {

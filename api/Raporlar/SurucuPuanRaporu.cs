@@ -39,7 +39,7 @@ public sealed class SurucuPuanRaporu : IRapor
 
     // Eski formda seçenekler kullanıcının surucukimlik kayıtlarından (KIMLIKID/ADSOYAD) doluyordu; "all" = Hepsi.
     public IReadOnlyList<RaporParametre> Parametreler { get; } =
-        [new RaporParametre("kimlik_id", "Sürücü kimlik no (all = hepsi)", "metin", "all")];
+        [new RaporParametre("kimlik_id", "Sürücü", "secim", "all", [new RaporSecenek("all", "Hepsi")], Kaynak: "suruculer")];
 
     public async Task<RaporSonuc> CalistirAsync(RaporIstegi istek, SqlDb db, CancellationToken ct)
     {

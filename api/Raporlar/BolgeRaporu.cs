@@ -27,7 +27,7 @@ public sealed class BolgeRaporu : IRapor
     public int AzamiGun => 10;
 
     public IReadOnlyList<RaporParametre> Parametreler { get; } =
-        [new RaporParametre("bolge", "Bölge (ID, adı ya da all)", "metin")];
+        [new RaporParametre("bolge", "Bölge", "secim", "", [new RaporSecenek("", "Seçiniz"), new RaporSecenek("all", "Hepsi")], Kaynak: "bolgeler")];
 
     private static readonly IReadOnlyList<RaporKolon> Kolonlar =
     [

@@ -9,13 +9,18 @@ public enum AracSecimi { Yok, Tek, Cok }
 /// <summary>Raporun tarih seçimi: hiç, tarih-saat aralığı, ay (yıl+ay).</summary>
 public enum TarihSecimi { Yok, Aralik, Ay }
 
-/// <summary>Formda raporun ek alanı. Tur: sayi | metin | secim | onay.</summary>
+/// <summary>
+/// Formda raporun ek alanı. Tur: sayi | metin | secim | onay.
+/// Kaynak verilirse seçenekler (Secenekler'den sonra) GET /api/raporlar/secenekler/{Kaynak} ile kullanıcıya göre doldurulur:
+/// alarmTurleri, suruculer, canbusGirisleri, bolgeler, katmanlar, noktalar, gruplar.
+/// </summary>
 public sealed record RaporParametre(
     string Ad,
     string Baslik,
     string Tur,
     string? Varsayilan = null,
-    IReadOnlyList<RaporSecenek>? Secenekler = null);
+    IReadOnlyList<RaporSecenek>? Secenekler = null,
+    string? Kaynak = null);
 
 public sealed record RaporSecenek(string Deger, string Ad);
 

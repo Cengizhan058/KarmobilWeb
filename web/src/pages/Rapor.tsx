@@ -34,6 +34,8 @@ export default function Rapor() {
   const [bitis, setBitis] = useState(() => yerelGirdi(new Date()))
   const [ay, setAy] = useState(() => { const d = new Date(); return `${d.getFullYear()}-${iki(d.getMonth() + 1)}` })
   const [ekstra, setEkstra] = useState<Record<string, string>>({})
+  // Kaynaklı parametrelerin kullanıcıya göre dolan seçenekleri (alarm türleri, sürücüler, bölgeler...).
+  const [dinamik, setDinamik] = useState<Record<string, { deger: string; ad: string }[]>>({})
 
   const [sonuc, setSonuc] = useState<RaporSonucu | null>(null)
   const [yukleniyor, setYukleniyor] = useState(false)
@@ -48,7 +50,12 @@ export default function Rapor() {
     tanimlar().then(list => {
       const t = list.find(x => x.kod.toLowerCase() === kod.toLowerCase()) ?? null
       setTanim(t)
-      if (t) setEkstra(Object.fromEntries(t.parametreler.map(p => [p.ad, p.varsayilan ?? ''])))
+      if (t) {
+        setEkstra(Object.fromEntries(t.parametreler.map(p => [p.ad, p.varsayilan ?? ''])))
+        for (const p of t.parametreler.filter(x => x.kaynak)) {
+          api.raporSecenekleri(p.kaynak!).then(s => setDinamik(d => ({ ...d, [p.kaynak!]: s }))).catch(() => { /* yalnız sabit seçenekler kalır */ })
+        }
+      }
     }).catch(e => setHata(e instanceof Error ? e.message : 'Rapor tanımları alınamadı.'))
   }, [kod])
 
@@ -160,9 +167,9 @@ export default function Rapor() {
             ) : (
               <label key={p.ad} className="alan">
                 <span>{p.baslik}</span>
-                {p.tur === 'secim' && p.secenekler ? (
+                {p.tur === 'secim' ? (
                   <select className="secim" value={ekstra[p.ad] ?? ''} onChange={e => setEkstra({ ...ekstra, [p.ad]: e.target.value })}>
-                    {p.secenekler.map(s => <option key={s.deger} value={s.deger}>{s.ad}</option>)}
+                    {[...(p.secenekler ?? []), ...(p.kaynak ? dinamik[p.kaynak] ?? [] : [])].map(s => <option key={s.deger} value={s.deger}>{s.ad}</option>)}
                   </select>
                 ) : (
                   <input className="secim" type={p.tur === 'sayi' ? 'number' : 'text'} value={ekstra[p.ad] ?? ''} onChange={e => setEkstra({ ...ekstra, [p.ad]: e.target.value })} />

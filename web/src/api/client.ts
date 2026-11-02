@@ -132,7 +132,7 @@ export type Gecmis = {
   duraklar: Duraklama[]
 }
 
-export type RaporParametre = { ad: string; baslik: string; tur: 'sayi' | 'metin' | 'secim' | 'onay'; varsayilan: string | null; secenekler: { deger: string; ad: string }[] | null }
+export type RaporParametre = { ad: string; baslik: string; tur: 'sayi' | 'metin' | 'secim' | 'onay'; varsayilan: string | null; secenekler: { deger: string; ad: string }[] | null; kaynak: string | null }
 
 export type RaporTanimi = {
   kod: string
@@ -226,6 +226,7 @@ export const api = {
     istek<Gecmis>(`/api/gecmis?aracId=${aracId}&baslangic=${encodeURIComponent(baslangic)}&bitis=${encodeURIComponent(bitis)}&poi=${poi}`),
   haritaKatmanlari: () => istek<HaritaKatmanlari>('/api/harita-katmanlari'),
   raporlar: () => istek<RaporTanimi[]>('/api/raporlar'),
+  raporSecenekleri: (kaynak: string) => istek<{ deger: string; ad: string }[]>(`/api/raporlar/secenekler/${kaynak}`),
   rapor: (kod: string, sorgu: URLSearchParams) => istek<RaporSonucu>(`/api/raporlar/${kod}?${sorgu}`),
   aracDetay: (id: number) => istek<AracDetay>(`/api/araclar/${id}/detay`),
   // Gerçek cihaza komut gönderir (cihazkomut tablosuna SK yazılır).
