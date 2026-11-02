@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
+import { useSearchParams } from 'react-router-dom'
+import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet'
 import L, { type LatLngBoundsExpression } from 'leaflet'
-import { Gauge, Clock, User, MapPin, Route, Navigation, Lock } from 'lucide-react'
 import { api, type AracDurumu, type AracKonum, type Grup } from '../api/client.ts'
 import { useKullanici } from '../components/Duzen.tsx'
 import AracListesi from '../components/AracListesi.tsx'
-import { DURUMLAR, tamZaman, temizAdres } from '../lib/arac.ts'
+import AracBilgiPaneli from '../components/AracBilgiPaneli.tsx'
+import { DURUMLAR } from '../lib/arac.ts'
 
 // Eski sitedeki Google katmanlarıyla aynı (index.asp tMapInit).
 const KATMANLAR = {
@@ -30,7 +31,6 @@ function aracIkonu(a: AracKonum, secili: boolean) {
     html: `<div class="isaret-daire" style="background:${renk}">${isaret}</div><div class="isaret-plaka">${a.plaka}</div>`,
     iconSize: [0, 0],
     iconAnchor: [0, 0],
-    popupAnchor: [0, -16],
   })
 }
 
@@ -48,14 +48,21 @@ function SinirAyarla({ araclar }: { araclar: AracKonum[] }) {
   return null
 }
 
-function SeciliyeGit({ arac }: { arac: AracKonum | null }) {
+// Araç seçilince ya da Yakınlaştır'a basılınca (istek sayacı artar) araca uçar;
+// takip açıksa her konum güncellemesinde haritayı araca kaydırır.
+function SeciliyeGit({ arac, istek, takip }: { arac: AracKonum | null; istek: number; takip: boolean }) {
   const map = useMap()
-  const sonId = useRef<number | null>(null)
+  const son = useRef<string>('')
   useEffect(() => {
-    if (!arac || !arac.lat || !arac.lon || sonId.current === arac.id) return
-    sonId.current = arac.id
-    map.flyTo([arac.lat, arac.lon], Math.max(map.getZoom(), 16), { duration: .6 })
-  }, [arac, map])
+    if (!arac || !arac.lat || !arac.lon) return
+    const anahtar = `${arac.id}-${istek}`
+    if (son.current !== anahtar) {
+      son.current = anahtar
+      map.flyTo([arac.lat, arac.lon], Math.max(map.getZoom(), 16), { duration: .6 })
+    } else if (takip) {
+      map.panTo([arac.lat, arac.lon], { animate: true })
+    }
+  }, [arac, istek, takip, map])
   return null
 }
 
@@ -65,10 +72,13 @@ export default function Harita() {
   const [araclar, setAraclar] = useState<AracKonum[]>([])
   const [gruplar, setGruplar] = useState<Grup[]>([])
   const [grupId, setGrupId] = useState<number | null>(null)
-  const [seciliId, setSeciliId] = useState<number | null>(null)
+  // /?arac=123 ile belirli bir araç seçili açılabilir.
+  const [params] = useSearchParams()
+  const [seciliId, setSeciliId] = useState<number | null>(() => Number(params.get('arac')) || null)
   const [durumFiltre, setDurumFiltre] = useState<Set<AracDurumu>>(new Set())
   const [hata, setHata] = useState<string | null>(null)
-  const isaretler = useRef<Record<number, L.Marker | null>>({})
+  const [takip, setTakip] = useState(false)
+  const [yaklasIstegi, setYaklasIstegi] = useState(0)
 
   useEffect(() => { api.gruplar().then(setGruplar).catch(() => { /* grup yoksa seçim gizlenir */ }) }, [])
 
@@ -96,9 +106,9 @@ export default function Harita() {
   const secili = araclar.find(a => a.id === seciliId) ?? null
 
   const sec = (a: AracKonum) => {
+    if (a.id !== seciliId) setTakip(false)
     setSeciliId(a.id)
-    // Popup, işaret haritaya gelince açılsın.
-    setTimeout(() => isaretler.current[a.id]?.openPopup(), 650)
+    setYaklasIstegi(n => n + 1)
   }
 
   const sinir: LatLngBoundsExpression = k.haritaSiniri
@@ -124,20 +134,15 @@ export default function Harita() {
         <MapContainer bounds={sinir} className="harita" zoomControl={true}>
           <TileLayer key={katman} url={t.url} subdomains={[...t.sub]} maxZoom={20} attribution="Google" />
           <SinirAyarla araclar={araclar} />
-          <SeciliyeGit arac={secili} />
+          <SeciliyeGit arac={secili} istek={yaklasIstegi} takip={takip} />
           {gorunen.map(a => (
             <Marker
               key={a.id}
               position={[a.lat!, a.lon!]}
               icon={aracIkonu(a, a.id === seciliId)}
               zIndexOffset={a.id === seciliId ? 1000 : 0}
-              ref={m => { isaretler.current[a.id] = m }}
-              eventHandlers={{ click: () => setSeciliId(a.id) }}
-            >
-              <Popup className="arac-popup" maxWidth={320}>
-                <AracKarti a={a} />
-              </Popup>
-            </Marker>
+              eventHandlers={{ click: () => sec(a) }}
+            />
           ))}
         </MapContainer>
 
@@ -151,27 +156,17 @@ export default function Harita() {
 
         {hata && <div className="harita-uyari">{hata}</div>}
       </div>
+
+      {secili && (
+        <AracBilgiPaneli
+          arac={secili}
+          takipte={takip}
+          onTakip={() => setTakip(t => !t)}
+          onYaklas={() => setYaklasIstegi(n => n + 1)}
+          onKapat={() => { setSeciliId(null); setTakip(false) }}
+        />
+      )}
     </div>
   )
 }
 
-function AracKarti({ a }: { a: AracKonum }) {
-  const d = DURUMLAR[a.durum]
-  return (
-    <div className="arac-kart">
-      <div className="kart-ust">
-        <strong>{a.plaka}</strong>
-        <span className="durum-rozet" style={{ background: d.renk }}>{d.ad}</span>
-      </div>
-      <ul>
-        <li><Gauge size={14} /> {Math.round(a.hiz)} km/s {a.kontak ? '· kontak açık' : '· kontak kapalı'}</li>
-        <li><Clock size={14} /> {tamZaman(a.sinyalTarihi)}</li>
-        {a.surucu && <li><User size={14} /> {a.surucu}</li>}
-        <li><MapPin size={14} /> {temizAdres(a.adres) ?? 'Adres yok'}</li>
-        {a.gunlukKm != null && <li><Route size={14} /> Bugün {Math.round(a.gunlukKm)} km{a.kadranKm != null ? ` · kadran ${Math.round(a.kadranKm).toLocaleString('tr-TR')} km` : ''}</li>}
-        {a.lat != null && <li><Navigation size={14} /> {a.lat.toFixed(5)}, {a.lon?.toFixed(5)}</li>}
-        {a.motorBlokeli && <li className="kirmizi"><Lock size={14} /> Motor blokesi aktif</li>}
-      </ul>
-    </div>
-  )
-}

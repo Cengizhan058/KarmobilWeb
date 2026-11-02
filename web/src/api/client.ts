@@ -61,6 +61,37 @@ export type AracKonum = {
 
 export type Grup = { id: number; ad: string; ustId: number | null }
 
+export type AracDetay = {
+  id: number
+  cihazId: string
+  plaka: string
+  cihazTanimi: string
+  gsm: string | null
+  imei: string | null
+  aracSahibi: string | null
+  aracCinsi: string | null
+  aracMarkasi: string | null
+  aracTipi: string | null
+  aciklama: string | null
+  dvrAdresi: string | null
+  batarya: number | null
+  motorBlokaj: 'aktif' | 'pasif' | null
+  azamiHiz: number | null
+  bugunKm: number | null
+  kontakAcik: boolean
+  sonKontakKapama: string | null
+  sonKontakKapamaAdresi: string | null
+  parkSuresiDakika: number | null
+  sonKontakAcma: string | null
+  sonKontakAcmaAdresi: string | null
+  kontakAcikSureDakika: number | null
+  sonAlarm: string | null
+  sonAlarmTarihi: string | null
+  sonAlarmAdresi: string | null
+  ilkSinyal: string | null
+  kayitTarihi: string | null
+}
+
 export class ApiHatasi extends Error {
   durum: number
   kod?: string
@@ -119,4 +150,7 @@ export const api = {
   bayi: () => istek<Bayi>('/api/bayi'),
   araclar: (grupId?: number | null) => istek<AracKonum[]>('/api/araclar' + (grupId ? `?grupId=${grupId}` : '')),
   gruplar: () => istek<Grup[]>('/api/gruplar'),
+  aracDetay: (id: number) => istek<AracDetay>(`/api/araclar/${id}/detay`),
+  // Gerçek cihaza komut gönderir (cihazkomut tablosuna SK yazılır).
+  anlikKonumIste: (id: number) => istek<{ mesaj: string }>(`/api/araclar/${id}/anlik-konum`, { method: 'POST' }),
 }

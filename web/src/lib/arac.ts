@@ -27,6 +27,17 @@ export function tamZaman(iso: string | null): string {
   return iso ? tamBicim.format(new Date(iso)) : '-'
 }
 
+/** 161 → "2 sa 41 dk", 1500 → "1 gün 1 sa" */
+export function sure(dakika: number | null): string {
+  if (dakika == null) return '-'
+  const g = Math.floor(dakika / 1440)
+  const s = Math.floor((dakika % 1440) / 60)
+  const d = dakika % 60
+  if (g > 0) return `${g} gün ${s} sa`
+  if (s > 0) return `${s} sa ${d} dk`
+  return `${d} dk`
+}
+
 /** Türkçe büyük harfe çevirip karşılaştırır (eski sitedeki strToUpper ile aynı amaç). */
 export function aramaMetni(s: string | null | undefined): string {
   return (s ?? '').toLocaleUpperCase('tr-TR')

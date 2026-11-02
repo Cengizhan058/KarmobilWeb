@@ -56,6 +56,51 @@ public static class Sql
         ORDER BY c.PLAKA
         """;
 
+    // data/_getClientDetail.asp + _getClients.asp (Açıklama = EHLIYETNO, eski bilgi ekranıyla aynı).
+    public const string AracDetay = $"""
+        SELECT c.ID, c.CIHAZID, c.PLAKA, UPPER(c.CIHAZTIPI) AS CIHAZTIPI, c.CONNTYPE, c.SERVERIP, c.IPNO,
+               c.GSM, c.IMEINO, c.ARACSAHIBI, c.ARACCINSI, c.ARACMARKASI, c.ARACTIPI, c.EHLIYETNO AS ACIKLAMA,
+               c.DVRIPNO, c.MOTOR, c.SKBATTERY, c.KONTAK, c.LASTSTOP, c.SKKONUM, c.MAXHIZ,
+               DATEDIFF(minute, c.LASTSTOP, GETDATE()) AS PARK_DAKIKA,
+               c.ILKSINYALTARIH, c.KAYITTARIHI
+        FROM clients c WITH (NOLOCK)
+        WHERE c.ID = @aracId AND {KullaniciAraclari}
+        """;
+
+    // _aracDetay.asp: günlük mesafe (bugün 00:00'dan şimdiye).
+    public const string GunlukMesafe = "SELECT dbo.mesafeHesapla(@cihazId, @ilk, @son) AS MESAFE";
+
+    // _aracDetay.asp: son kontak açma (G2) son 24 saatte; kontak kapalıysa son duruştan önceki.
+    public const string SonKontakAcma = """
+        SELECT TOP 1 TARIH, KONUM FROM konumlar WITH (NOLOCK)
+        WHERE CIHAZID = @cihazId AND RAPORKODU = 'G2'
+          AND TARIH > DATEADD(hour, -24, GETDATE())
+          AND (@sinir IS NULL OR TARIH <= @sinir)
+        ORDER BY TARIH DESC
+        """;
+
+    // _aracDetay.asp: son alarm (son 24 saat).
+    public const string SonAlarm = """
+        SELECT TOP 1 TARIH, KONUM, ALARM FROM konumlar WITH (NOLOCK)
+        WHERE CIHAZID = @cihazId AND RAPORKODU IN ('AA','AH','XD','XH','XR','BA','XE')
+          AND TARIH > DATEADD(hour, -24, GETDATE())
+        ORDER BY TARIH DESC
+        """;
+
+    // data/_prcAnlikKonum.asp ile aynı: gateway cihazkomut'taki SK kaydını görüp cihaza konum isteği yollar.
+    // Cihaz IP'si 0.0.0.0 ya da HATA=9 ise komut yazılmaz (eski davranış).
+    public const string AnlikKonumIste = """
+        IF EXISTS (SELECT 1 FROM clients WITH (NOLOCK) WHERE STATUS = 1 AND CIHAZID = @cihazId AND IPNO <> '0.0.0.0' AND ISNULL(HATA,'') <> '9')
+        BEGIN
+            IF EXISTS (SELECT 1 FROM cihazkomut WHERE CIHAZID = @cihazId AND KOMUT = 'SK')
+                UPDATE cihazkomut SET TARIH = GETDATE(), STATUS = 0 WHERE CIHAZID = @cihazId AND KOMUT = 'SK';
+            ELSE
+                INSERT INTO cihazkomut (CIHAZID, KOMUT, STR1, STR2, TARIH) VALUES (@cihazId, 'SK', '-', '-', GETDATE());
+            SELECT 1;
+        END
+        ELSE SELECT 0;
+        """;
+
     // data/_getFleets.asp
     public const string Gruplar = """
         SELECT ID, GROUPNAME, PARENTID FROM groups WITH (NOLOCK)
