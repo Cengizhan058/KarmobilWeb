@@ -452,6 +452,17 @@ input { font: inherit; }
 .grafik-imlec { stroke: #d9534f; stroke-width: 1.5; }
 .grafik-bilgi { padding: 8px 2px 0; color: var(--yazi-2); }
 
+/* Genel rapor sayfası */
+.coklu-secim { max-height: 220px; overflow-y: auto; margin-top: 6px; padding: 8px 10px; border: 1px solid var(--cizgi); border-radius: 8px; }
+.coklu-secim .onay-satir { margin-bottom: 6px; }
+.kucuk-not { margin: -6px 0 12px; font-size: 12px; }
+.rapor-ust { align-items: center; padding: 8px 12px; }
+.rapor-arama { width: 320px; background: var(--yuzey-2); }
+.rapor-ust .gecmis-araclar { align-items: center; padding: 0; }
+.tablo th.siralanabilir { cursor: pointer; user-select: none; }
+.tablo th.siralanabilir svg { margin-left: 4px; vertical-align: -1px; }
+.harita-baglanti { display: inline-flex; align-items: center; gap: 4px; color: var(--vurgu); text-decoration: none; }
+
 @media print {
   .ust-cubuk, .gecmis-form, .gecmis-ust, .tablo-not { display: none !important; }
   .uygulama, .icerik, .gecmis-sayfa, .gecmis-icerik, .tablo-kap { display: block; height: auto; overflow: visible; padding: 0; background: #fff; }

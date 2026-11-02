@@ -100,6 +100,7 @@ app.MapGet("/api/health", async (SqlDb db, CancellationToken ct) =>
 app.MapAuth();
 app.MapArac();
 app.MapGecmis();
+app.MapRapor();
 
 // ---------------------------------------------------------------------------
 // Arayüzün API ile birlikte sunulması (isteğe bağlı)

@@ -132,6 +132,27 @@ export type Gecmis = {
   duraklar: Duraklama[]
 }
 
+export type RaporParametre = { ad: string; baslik: string; tur: 'sayi' | 'metin' | 'secim' | 'onay'; varsayilan: string | null; secenekler: { deger: string; ad: string }[] | null }
+
+export type RaporTanimi = {
+  kod: string
+  baslik: string
+  arac: 'yok' | 'tek' | 'cok'
+  tarih: 'yok' | 'aralik' | 'ay'
+  azamiGun: number
+  parametreler: RaporParametre[]
+}
+
+export type RaporKolon = { ad: string; baslik: string; tur: 'metin' | 'sayi' | 'tarih' | 'sure' | 'km' | 'koordinat' }
+
+export type RaporSonucu = {
+  kod: string
+  baslik: string
+  kolonlar: RaporKolon[]
+  satirlar: Record<string, unknown>[]
+  ozet: string | null
+}
+
 export class ApiHatasi extends Error {
   durum: number
   kod?: string
@@ -194,6 +215,8 @@ export const api = {
   gorunumKaydet: (ayar: GorunumAyari) => istek<void>('/api/ayarlar/gorunum', { method: 'PUT', body: JSON.stringify(ayar) }),
   gecmis: (aracId: number, baslangic: string, bitis: string, poi: boolean) =>
     istek<Gecmis>(`/api/gecmis?aracId=${aracId}&baslangic=${encodeURIComponent(baslangic)}&bitis=${encodeURIComponent(bitis)}&poi=${poi}`),
+  raporlar: () => istek<RaporTanimi[]>('/api/raporlar'),
+  rapor: (kod: string, sorgu: URLSearchParams) => istek<RaporSonucu>(`/api/raporlar/${kod}?${sorgu}`),
   aracDetay: (id: number) => istek<AracDetay>(`/api/araclar/${id}/detay`),
   // Gerçek cihaza komut gönderir (cihazkomut tablosuna SK yazılır).
   anlikKonumIste: (id: number) => istek<{ mesaj: string }>(`/api/araclar/${id}/anlik-konum`, { method: 'POST' }),

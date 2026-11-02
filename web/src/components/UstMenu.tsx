@@ -24,7 +24,8 @@ export default function UstMenu({ kullanici, onGorunum }: { kullanici: OturumKul
 
   const git = (m: MenuMaddesi) => {
     setAcikId(null)
-    navigate(m.yol ?? `/yapim/${m.id}?ad=${encodeURIComponent(m.ad)}`)
+    // Raporlar genel rapor sayfasında açılır (/rapor/report_park); taşınmamışsa sayfa bunu söyler.
+    navigate(m.yol ?? (m.id.startsWith('report_') ? `/rapor/${m.id}` : `/yapim/${m.id}?ad=${encodeURIComponent(m.ad)}`))
   }
 
   const cikis = () => {
