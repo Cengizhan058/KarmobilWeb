@@ -45,8 +45,12 @@ public static class YonetimEndpoints
         IF @cihazId IS NULL BEGIN ROLLBACK; SELECT 0; RETURN; END
 
         UPDATE clients SET
-            PLAKA = @plaka, ARACSAHIBI = @aracSahibi, ARACCINSI = @aracCinsi, ARACMARKASI = @aracMarkasi, ARACTIPI = @aracTipi,
-            SOFOR = @surucu, EHLIYETNO = @aciklama, ICON = @ikon,
+            PLAKA = @plaka,
+            -- Okurken "-" boş gösterilir; boş bırakılan alan önceden "-" ise öyle kalır (eski veriyle aynı).
+            ARACSAHIBI = CASE WHEN @aracSahibi = '' AND ARACSAHIBI = '-' THEN '-' ELSE @aracSahibi END, ARACCINSI = CASE WHEN @aracCinsi = '' AND ARACCINSI = '-' THEN '-' ELSE @aracCinsi END,
+            ARACMARKASI = CASE WHEN @aracMarkasi = '' AND ARACMARKASI = '-' THEN '-' ELSE @aracMarkasi END, ARACTIPI = CASE WHEN @aracTipi = '' AND ARACTIPI = '-' THEN '-' ELSE @aracTipi END,
+            SOFOR = CASE WHEN @surucu = '' AND SOFOR = '-' THEN '-' ELSE @surucu END, EHLIYETNO = CASE WHEN @aciklama = '' AND EHLIYETNO = '-' THEN '-' ELSE @aciklama END,
+            ICON = @ikon,
             MTARIH1 = COALESCE(@m1, MTARIH1), MTARIH2 = COALESCE(@m2, MTARIH2),
             STARIH1 = COALESCE(@s1, STARIH1), STARIH2 = COALESCE(@s2, STARIH2),
             KTARIH1 = COALESCE(@k1, KTARIH1), KTARIH2 = COALESCE(@k2, KTARIH2),
