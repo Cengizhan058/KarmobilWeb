@@ -15,7 +15,7 @@ const renk = (s: Seviye) => SEVIYELER.find(x => x.kod === s)!.renk
 
 /**
  * Araçlar → Cihaz Arıza Bildirimleri: son 7 günün verisinden cihaz/montaj sorunları
- * (sökme şüphesi, enerji kesik, sık enerji kesintisi, kontak bağlantısı, km sayacı, batarya, kadran km).
+ * (sökme şüphesi, enerji kesik, sık enerji kesintisi, kontak bağlantısı, km sayacı, kadran km).
  */
 export default function CihazSagligi() {
   const [veri, setVeri] = useState<Veri | null>(null)
@@ -55,7 +55,7 @@ export default function CihazSagligi() {
       </div>
       <p className="kucuk-not">
         Son 7 günün verisine göre: sökülmüş olabilecek cihazlar, enerjisi kesik ya da sık kesilen cihazlar, kontak bağlantısı olmayan
-        ya da km saymayan cihazlar, düşük batarya. {veri && `${veri.toplamArac} araç tarandı.`}
+        ya da km saymayan cihazlar. {veri && `${veri.toplamArac} araç tarandı.`}
       </p>
       {hata && <div className="uyari-kutu">{hata}</div>}
       {!veri && !hata && <div className="yapim kucuk"><span className="donen" /></div>}

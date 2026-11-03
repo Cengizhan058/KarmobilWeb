@@ -125,10 +125,9 @@ public static class YonetimEndpoints
 
     // Cihaz sağlığı: son 7 günün konumlarından arıza belirtileri (konumlar CIHAZID+TARIH kümelenmiş indeksli, araç başına aralık okunur).
     // Rapor kodları: E1 = ana enerji kesildi (raportanim "ENERJI ALARMI"), E0 = enerji geldi, F0 = sahte cihaz takıldı.
-    // E0/E1 anlamı veriden doğrulandı: son olayı E0 olan cihazların çoğunda ISITCHARGING = 1.
     private const string CihazSagligi = """
         DECLARE @t1 datetime = DATEADD(day, -7, GETDATE());
-        SELECT c.ID, c.CIHAZID, c.PLAKA, c.KONTROLTARIH, dbo.AktifMi(c.KONTROLTARIH) AS AKTIF, c.SKBATTERY, c.ISITCHARGING,
+        SELECT c.ID, c.CIHAZID, c.PLAKA, c.KONTROLTARIH, dbo.AktifMi(c.KONTROLTARIH) AS AKTIF,
                CASE WHEN EXISTS (SELECT 1 FROM kadran kd WITH (NOLOCK) WHERE kd.CIHAZID = c.CIHAZID) THEN 1 ELSE 0 END AS KADRANVAR,
                s.ADET, s.HAREKETLI, s.KONTAKACIK, s.MESAFEDEGISTI, s.KESINTI, s.SAHTE, e.RAPORKODU AS SONENERJI, e.TARIH AS SONENERJITARIH
         FROM clients c WITH (NOLOCK)
@@ -394,7 +393,7 @@ public static class YonetimEndpoints
             l.Add(new("sokme", "kritik", "Enerji kesildi, sinyal yok - cihaz sökülmüş olabilir",
                 $"Enerji kesilme: {Tarih(s["SONENERJITARIH"])}, son sinyal: {Tarih(s["KONTROLTARIH"])}"));
         else if (enerjiKesik)
-            l.Add(new("enerji", "kritik", "Ana enerji kesik (cihaz kendi bataryasıyla çalışıyor)", $"Enerji kesilme: {Tarih(s["SONENERJITARIH"])}"));
+            l.Add(new("enerji", "kritik", "Ana enerji kesik", $"Enerji kesilme: {Tarih(s["SONENERJITARIH"])}"));
         // Son 30 günde kesilen sinyal yeni bir olaydır (sökülmüş olabilir); daha eskisi zaten arızalı/montajsız listesinde.
         else if (!aktif && s["KONTROLTARIH"] is DateTime son && son > DateTime.Now.AddDays(-30))
             l.Add(new("sinyal", "uyari", "Sinyal kesildi", $"Son sinyal: {Tarih(son)}"));
@@ -410,8 +409,6 @@ public static class YonetimEndpoints
                 $"Araç hareket ettiği hâlde ({hareketli} hareketli konum, 7 gün) kontak hep kapalı görünüyor; km sayılmayabilir"));
         if (hareketli >= 10 && Sayi("MESAFEDEGISTI") == 0)
             l.Add(new("km", "uyari", "Km sayacı ilerlemiyor", $"Araç hareket ettiği hâlde ({hareketli} hareketli konum, 7 gün) cihazın mesafe değeri değişmiyor"));
-        if (Sayi("ISITCHARGING") == 0 && Sayi("SKBATTERY") is >= 0 and <= 20)
-            l.Add(new("batarya", "uyari", "Batarya düşük", $"%{Sayi("SKBATTERY")}"));
         if (Sayi("KADRANVAR") == 0)
             l.Add(new("kadran", "bilgi", "Kadran km girilmemiş", "Araç Yönetimi'nden göstergedeki km girilmeli"));
         return l;
