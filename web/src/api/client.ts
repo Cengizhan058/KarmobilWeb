@@ -28,6 +28,7 @@ export type OturumKullanici = {
   arizalilariGizle: boolean
   /** Gider takibi açık (clients.FMS = 1) aracı var mı */
   giderYonetimi: boolean
+  dvrVar: boolean
 }
 
 export type GorunumAyari = Partial<Pick<OturumKullanici, 'etiket' | 'araclariGrupla' | 'arizalilariGizle'>>
@@ -282,6 +283,13 @@ export const api = {
     istek<{ id?: number; mesaj: string }>(id ? `/api/giderler/${tur}/${id}` : `/api/giderler/${tur}`, { method: id ? 'PUT' : 'POST', body: JSON.stringify({ aracId, alanlar }) }),
   giderSil: (tur: string, id: number) => istek<{ mesaj: string }>(`/api/giderler/${tur}/${id}`, { method: 'DELETE' }),
   cihazSagligi: () => istek<CihazSagligi>('/api/yonetim/cihaz-sagligi'),
+  gostergeler: () => istek<Gostergeler>('/api/gostergeler'),
+  mesajlar: () => istek<Mesaj[]>('/api/mesajlar'),
+  okunmamisMesaj: () => istek<{ sayi: number }>('/api/mesajlar/okunmamis'),
+  mesajOkundu: (id: number) => istek<{ mesaj: string }>(`/api/mesajlar/${id}/okundu`, { method: 'POST' }),
+  mesajSil: (id: number) => istek<{ mesaj: string }>(`/api/mesajlar/${id}`, { method: 'DELETE' }),
+  dvrAraclari: () => istek<{ id: number; plaka: string; adres: string }[]>('/api/dvr'),
+  destek: () => istek<{ unvan: string | null; telefon: string | null; web: string | null; whatsapp: string }>('/api/destek'),
   arizaliAraclar: () => istek<ArizaliArac[]>('/api/yonetim/arizali-araclar'),
   aktifBildirimler: () => istek<Record<string, unknown>[]>('/api/yonetim/aktif-bildirimler'),
   programTablosu: () => istek<Record<string, unknown>[]>('/api/yonetim/program-tablosu'),
@@ -298,3 +306,13 @@ export const api = {
   // Gerçek cihaza komut gönderir (cihazkomut tablosuna SK yazılır).
   anlikKonumIste: (id: number) => istek<{ mesaj: string }>(`/api/araclar/${id}/anlik-konum`, { method: 'POST' }),
 }
+
+export type GostergeSirasi = { id: number; plaka: string; deger: number }
+export type Gostergeler = {
+  durum: { hareketli: number; rolanti: number; park: number; veriYok: number; toplam: number }
+  alarmlar: { kod: string; ad: string; adet: number }[]
+  mesafe: { toplamKm: number; ortalamaKm: number; mesaiIciKm: number; mesaiDisiKm: number; enCok: GostergeSirasi[] }
+  hiz: { maks: number; ortalama: number; enCok: GostergeSirasi[] }
+}
+
+export type Mesaj = { id: number; tarih: string; kimden: string | null; baslik: string | null; mesaj: string | null; okundu: boolean }

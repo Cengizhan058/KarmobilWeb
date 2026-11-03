@@ -116,6 +116,7 @@ app.MapIslem();
 app.MapYonetim();
 app.MapAyar();
 app.MapGider();
+app.MapGenel();
 
 // ---------------------------------------------------------------------------
 // Arayüzün API ile birlikte sunulması (isteğe bağlı)

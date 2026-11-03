@@ -25,6 +25,7 @@ export type MenuMaddesi = {
 const r = (k: OturumKullanici) => k.raporlar
 
 export const MENU: MenuMaddesi[] = [
+  { id: 'gostergeler', ad: 'Göstergeler', ikon: Gauge, yol: '/gostergeler' },
   {
     id: 'islemler', ad: 'İşlemler', ikon: Wrench, alt: [
       { id: 'layer_duzenle', ad: 'Nokta Grupları / Katmanlar', ikon: Layers, yol: '/islemler?sekme=nokta' },
@@ -45,7 +46,7 @@ export const MENU: MenuMaddesi[] = [
       { id: 'cihaz_sagligi', ad: 'Cihaz Arıza Bildirimleri', ikon: Activity, yol: '/cihaz-sagligi' },
     ],
   },
-  { id: 'dvrlist', ad: 'DVR-Kamera', ikon: Video },
+  { id: 'dvrlist', ad: 'DVR-Kamera', ikon: Video, goster: k => k.dvrVar, yol: '/dvr' },
   {
     id: 'ayarlar', ad: 'Ayarlar', ikon: Settings, alt: [
       { id: 'pwd_settings', ad: 'Şifre / Parola Ayarları', ikon: KeyRound, goster: k => k.kullaniciAyarlari },
@@ -86,7 +87,7 @@ export const MENU: MenuMaddesi[] = [
       { id: 'report_bakim', ad: 'Araç Bakım Raporu', ikon: Wrench, goster: r },
     ],
   },
-  { id: 'mesajlar', ad: 'Mesajlar', ikon: Mail },
+  { id: 'mesajlar', ad: 'Mesajlar', ikon: Mail, yol: '/mesajlar' },
   {
     id: 'gorunum', ad: 'Görünüm', ikon: Eye, alt: [
       { id: 'arac_grupla', ad: 'Araçları haritada grupla', ikon: Layers, ayar: 'grupla' },
@@ -111,7 +112,7 @@ export const MENU: MenuMaddesi[] = [
       { id: 'fms_diger', ad: 'Genel Masraf Girişi', ikon: Coins, yol: '/gider/diger' },
     ],
   },
-  { id: 'destek', ad: 'Destek', ikon: Headset },
+  { id: 'destek', ad: 'Destek', ikon: Headset, yol: '/destek' },
 ]
 
 export function gorunurMenu(k: OturumKullanici): MenuMaddesi[] {

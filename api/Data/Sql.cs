@@ -25,6 +25,8 @@ public static class Sql
                ISNULL(AKILLIBLOKE,0) AS AKILLIBLOKE,
                CASE WHEN EXISTS (SELECT 1 FROM userclients uc WITH (NOLOCK) JOIN clients c WITH (NOLOCK) ON c.ID = uc.CLIENTID
                                  WHERE uc.USERID = users.ID AND c.STATUS = 1 AND c.FMS = 1) THEN 1 ELSE 0 END AS FMSVAR,
+               CASE WHEN EXISTS (SELECT 1 FROM userclients uc WITH (NOLOCK) JOIN clients c WITH (NOLOCK) ON c.ID = uc.CLIENTID
+                                 WHERE uc.USERID = users.ID AND c.STATUS = 1 AND ISNULL(LTRIM(RTRIM(c.DVRIPNO)), '') NOT IN ('', '1.1.1.1')) THEN 1 ELSE 0 END AS DVRVAR,
                MAPX1, MAPY1, MAPX2, MAPY2, TEMA,
                ISNULL(GORUNUM,0) AS GORUNUM, ISNULL(ARACLARIGRUPLA,0) AS ARACLARIGRUPLA, ISNULL(KOPUKLARIFILTRE,0) AS KOPUKLARIFILTRE
         FROM users WITH (NOLOCK)

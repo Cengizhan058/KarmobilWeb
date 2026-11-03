@@ -16,6 +16,10 @@ import Ruhsat from './pages/Ruhsat.tsx'
 import MesaiSaatleri from './pages/MesaiSaatleri.tsx'
 import RfidKartlari from './pages/RfidKartlari.tsx'
 import Liste from './pages/Liste.tsx'
+import Gostergeler from './pages/Gostergeler.tsx'
+import Mesajlar from './pages/Mesajlar.tsx'
+import Dvr from './pages/Dvr.tsx'
+import Destek from './pages/Destek.tsx'
 
 export default function App() {
   return (
@@ -35,6 +39,10 @@ export default function App() {
         <Route path="mesai-saatleri" element={<MesaiSaatleri />} />
         <Route path="rfid" element={<RfidKartlari />} />
         <Route path="liste/:anahtar" element={<Liste />} />
+        <Route path="gostergeler" element={<Gostergeler />} />
+        <Route path="mesajlar" element={<Mesajlar />} />
+        <Route path="dvr" element={<Dvr />} />
+        <Route path="destek" element={<Destek />} />
         <Route path="yapim/:id" element={<YapimAsamasinda />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

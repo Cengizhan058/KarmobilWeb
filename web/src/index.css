@@ -667,3 +667,49 @@ input { font: inherit; }
 .satir-dugmeler button { display: inline-grid; place-items: center; width: 30px; height: 30px; margin-left: 2px; border: 1px solid var(--cizgi); border-radius: 6px; background: var(--yuzey); color: var(--yazi-2); }
 .satir-dugmeler button:hover { border-color: var(--vurgu); color: var(--vurgu); }
 textarea.secim { height: auto; padding: 8px 10px; resize: vertical; }
+
+/* ---------- Göstergeler, mesajlar, destek ---------- */
+.menu-rozet { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #d9534f; color: #fff; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; }
+.gosterge-izgara { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.gosterge-kart { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; border: 1px solid var(--cizgi); border-radius: 10px; background: var(--yuzey); }
+.gosterge-kart h3 { margin: 0; font-size: 15px; font-weight: 500; }
+.gosterge-kart h3 small { font-weight: 400; font-size: 12px; margin-left: 4px; }
+.buyuk-sayi { font-size: 30px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.buyuk-sayi small { font-size: 14px; color: var(--soluk); font-weight: 400; }
+.oran-cubugu { display: flex; gap: 2px; height: 12px; }
+.oran-cubugu span { min-width: 3px; border-radius: 4px; }
+.oran-cubugu .bos { flex: 1; background: var(--cizgi); }
+.gosterge-liste { list-style: none; margin: 0; padding: 0; }
+.gosterge-liste li { display: grid; grid-template-columns: 12px 1fr auto 42px; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--cizgi); }
+.gosterge-liste li:last-child { border-bottom: 0; }
+.gosterge-liste li strong { font-variant-numeric: tabular-nums; text-align: right; }
+.gosterge-liste li .soluk { text-align: right; font-size: 12.5px; }
+.gosterge-liste.sade li { grid-template-columns: 1fr auto; }
+.destek-kart .gosterge-liste.sade li { grid-template-columns: 18px 90px 1fr; color: var(--yazi-2); }
+.destek-kart { max-width: 460px; }
+.destek-kart p { margin: 0; }
+.gosterge-liste .nokta { width: 10px; height: 10px; border-radius: 50%; }
+.gosterge-liste .alarm-var { color: #d9534f; }
+.ikili-sayi { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ikili-sayi div { display: flex; flex-direction: column; gap: 2px; }
+.ikili-sayi strong { font-size: 20px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.gosterge-sira { list-style: none; margin: 0; padding: 0; }
+.gosterge-sira li { display: grid; grid-template-columns: 96px 1fr 76px; align-items: center; gap: 8px; padding: 4px 0; }
+.gosterge-sira a { color: var(--yazi); text-decoration: none; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gosterge-sira a:hover { text-decoration: underline; }
+.gosterge-sira strong { text-align: right; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.sira-cubuk { height: 8px; }
+.sira-cubuk span { display: block; height: 100%; min-width: 3px; border-radius: 0 4px 4px 0; background: var(--vurgu); }
+.kart-baglanti { margin-top: auto; font-size: 13px; color: var(--vurgu); }
+.donuyor { animation: don 1s linear infinite; }
+.mesaj-duzen { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+.tablo tr.kalin td { font-weight: 600; }
+.tablo.secilebilir tbody tr { cursor: pointer; }
+.mesaj-detay { padding: 16px 18px; border: 1px solid var(--cizgi); border-radius: 10px; background: var(--yuzey); }
+.mesaj-detay header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.mesaj-detay h3 { margin: 0 0 4px; font-size: 16px; font-weight: 500; }
+.mesaj-govde { white-space: pre-wrap; line-height: 1.5; }
+@media (max-width: 960px) { .mesaj-duzen { grid-template-columns: 1fr; } }
+/* Dar ekranda alt menüsü olmayan üst maddeler (Göstergeler, DVR, Mesajlar, Destek) yalnız simge. */
+@media (max-width: 1500px) { .menu-dugme.tekil > span:not(.menu-rozet) { display: none; } }
+.destek-kart a { color: var(--vurgu); text-decoration: none; }

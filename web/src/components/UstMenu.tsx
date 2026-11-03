@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Check, ChevronDown, LogOut } from 'lucide-react'
-import { auth, type GorunumAyari, type OturumKullanici } from '../api/client.ts'
+import { api, auth, type GorunumAyari, type OturumKullanici } from '../api/client.ts'
 import { gorunurMenu, type MenuMaddesi } from '../lib/menu.ts'
 import TemaSecici from './TemaSecici.tsx'
+import { MESAJ_OLAYI } from '../pages/Mesajlar.tsx'
 
 const ETIKETLER = ['Plaka', 'Cihaz ID', 'Sürücü', 'Hız']
 
@@ -12,6 +13,15 @@ export default function UstMenu({ kullanici, onGorunum }: { kullanici: OturumKul
   const [acikId, setAcikId] = useState<string | null>(null)
   const cubuk = useRef<HTMLElement>(null)
   const menu = gorunurMenu(kullanici)
+  // Okunmamış mesaj sayısı (eski site konum yenilemesinde MESAJSAY ile alıyordu): açılışta, 5 dakikada bir ve mesaj okununca.
+  const [okunmamis, setOkunmamis] = useState(0)
+  useEffect(() => {
+    const al = () => api.okunmamisMesaj().then(r => setOkunmamis(r.sayi)).catch(() => { /* rozet gösterilmez */ })
+    al()
+    const t = setInterval(al, 300_000)
+    window.addEventListener(MESAJ_OLAYI, al)
+    return () => { clearInterval(t); window.removeEventListener(MESAJ_OLAYI, al) }
+  }, [])
 
   useEffect(() => {
     if (!acikId) return
@@ -51,12 +61,14 @@ export default function UstMenu({ kullanici, onGorunum }: { kullanici: OturumKul
           return (
             <div key={m.id} className="menu-grup">
               <button
-                className={'menu-dugme' + (acik ? ' acik' : '')}
+                className={'menu-dugme' + (acik ? ' acik' : '') + (m.alt?.length ? '' : ' tekil')}
+                title={m.alt?.length ? undefined : m.ad}
                 onClick={() => (m.alt?.length ? setAcikId(acik ? null : m.id) : git(m))}
                 onMouseEnter={() => acikId && m.alt?.length && setAcikId(m.id)}
               >
                 <Ikon size={17} />
                 <span>{m.ad}</span>
+                {m.id === 'mesajlar' && okunmamis > 0 && <span className="menu-rozet" title={`${okunmamis} okunmamış mesaj`}>{okunmamis}</span>}
                 {m.alt?.length ? <ChevronDown size={14} className="menu-ok" /> : null}
               </button>
               {acik && m.alt && (

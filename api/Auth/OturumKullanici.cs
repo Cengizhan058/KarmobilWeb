@@ -23,6 +23,8 @@ public sealed record OturumKullanici(
     bool AkilliBlokaj,
     // Gider takibi açık (clients.FMS = 1) en az bir aracı var mı (eski _menubarge.asp: yoksa Gider Yönetimi kapalı).
     bool GiderYonetimi,
+    // DVR adresi girilmiş aracı var mı (eski menüde DVR-Kamera yalnız o zaman görünürdü; boş adresler eskiden sayılıyordu).
+    bool DvrVar,
     HaritaSiniri? HaritaSiniri,
     string? Tema,
     // Görünüm tercihleri (users.GORUNUM / ARACLARIGRUPLA / KOPUKLARIFILTRE).
