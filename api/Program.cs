@@ -118,6 +118,7 @@ app.MapAyar();
 app.MapGider();
 app.MapGenel();
 app.MapBildirim();
+app.MapAltKullanici();
 
 // ---------------------------------------------------------------------------
 // Arayüzün API ile birlikte sunulması (isteğe bağlı)

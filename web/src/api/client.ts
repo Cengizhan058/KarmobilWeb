@@ -283,6 +283,11 @@ export const api = {
     istek<{ id?: number; mesaj: string }>(id ? `/api/giderler/${tur}/${id}` : `/api/giderler/${tur}`, { method: id ? 'PUT' : 'POST', body: JSON.stringify({ aracId, alanlar }) }),
   giderSil: (tur: string, id: number) => istek<{ mesaj: string }>(`/api/giderler/${tur}/${id}`, { method: 'DELETE' }),
   cihazSagligi: () => istek<CihazSagligi>('/api/yonetim/cihaz-sagligi'),
+  altKullanicilar: () => istek<AltKullaniciListesi>('/api/alt-kullanicilar'),
+  altKullaniciAraclari: (id: number) => istek<number[]>(`/api/alt-kullanicilar/${id}/araclar`),
+  altKullaniciKaydet: (id: number | null, k: { kullaniciAdi: string; sifre: string | null; yetkiler: AltYetkiler; araclar: number[] }) =>
+    istek<{ id?: number; mesaj: string }>(id ? `/api/alt-kullanicilar/${id}` : '/api/alt-kullanicilar', { method: id ? 'PUT' : 'POST', body: JSON.stringify(k) }),
+  altKullaniciSil: (id: number) => istek<{ mesaj: string }>(`/api/alt-kullanicilar/${id}`, { method: 'DELETE' }),
   bildirimTanimlari: () => istek<BildirimTanimlari>('/api/bildirim/tanimlar'),
   bildirimAyarlari: (aracId: number) => istek<AlarmAyari[]>(`/api/bildirim/araclar/${aracId}`),
   bildirimKaydet: (araclar: number[], alarmlar: AlarmAyari[]) =>
@@ -337,4 +342,11 @@ export type BildirimTanimlari = {
   sms: { acik: boolean; adresler: string[] }
   bolgeler: { id: number; ad: string }[]
   rotalar: { id: number; ad: string }[]
+}
+
+export type AltYetkiler = { harita: boolean; aracYonetimi: boolean; cihazProgramlama: boolean; grupYonetimi: boolean; raporlar: boolean }
+export type AltKullaniciListesi = {
+  limit: number
+  verilebilir: AltYetkiler
+  kullanicilar: { id: number; kullaniciAdi: string; yetkiler: AltYetkiler; aracSayisi: number }[]
 }

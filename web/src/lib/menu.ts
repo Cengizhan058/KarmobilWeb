@@ -50,7 +50,7 @@ export const MENU: MenuMaddesi[] = [
   {
     id: 'ayarlar', ad: 'Ayarlar', ikon: Settings, alt: [
       { id: 'pwd_settings', ad: 'Şifre / Parola Ayarları', ikon: KeyRound, goster: k => k.kullaniciAyarlari },
-      { id: 'sub_users', ad: 'Kullanıcı Yetkilendirme', ikon: ShieldCheck, goster: k => k.kullaniciAyarlari && k.altKullaniciLimiti > 0 },
+      { id: 'sub_users', ad: 'Kullanıcı Yetkilendirme', ikon: ShieldCheck, goster: k => k.kullaniciAyarlari && k.altKullaniciLimiti > 0, yol: '/alt-kullanicilar' },
       { id: 'rfid_management', ad: 'RF-ID Kart Yönetimi', ikon: BadgeCheck, yol: '/rfid' },
       { id: 'work_hours', ad: 'Mesai Saatleri', ikon: Clock, yol: '/mesai-saatleri' },
       { id: 'smart_block', ad: 'Akıllı Motor Blokaj', ikon: Ban, goster: k => k.akilliBlokaj },
