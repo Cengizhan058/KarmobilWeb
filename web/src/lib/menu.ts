@@ -96,9 +96,9 @@ export const MENU: MenuMaddesi[] = [
   },
   {
     id: 'gider', ad: 'Gider Yönetimi', ikon: Wallet, goster: k => k.giderYonetimi, alt: [
-      { id: 'fms_masrafrapor', ad: 'Masraf Raporları', ikon: FileText },
-      { id: 'fms_custom', ad: 'Esnek Rapor', ikon: SlidersHorizontal },
-      { id: 'fms_toplamyakit', ad: 'Genel Yakıt Raporu', ikon: Fuel },
+      { id: 'fms_masrafrapor', ad: 'Masraf Raporları', ikon: FileText, yol: '/rapor/fms_masrafrapor' },
+      { id: 'fms_custom', ad: 'Esnek Rapor', ikon: SlidersHorizontal, yol: '/rapor/fms_custom' },
+      { id: 'fms_toplamyakit', ad: 'Genel Yakıt Raporu', ikon: Fuel, yol: '/rapor/fms_toplamyakit' },
       { id: 'fms_sigorta', ad: 'Sigortalar', ikon: ShieldCheck, yol: '/gider/sigorta' },
       { id: 'fms_yakit', ad: 'Yakıt Alımları', ikon: Fuel, yol: '/gider/yakit' },
       { id: 'fms_muayene', ad: 'Muayene', ikon: ClipboardCheck, yol: '/gider/muayene' },

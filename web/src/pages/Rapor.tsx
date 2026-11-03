@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { ArrowDown, ArrowUp, FileSpreadsheet, MapPin, Printer, Search, Hammer } from 'lucide-react'
-import { api, type AracKonum, type RaporKolon, type RaporSonucu, type RaporTanimi } from '../api/client.ts'
+import { api, type RaporKolon, type RaporSonucu, type RaporTanimi } from '../api/client.ts'
 import { sure } from '../lib/arac.ts'
 import { csvIndir, dosyaAdiParcasi } from '../lib/disaAktar.ts'
 
@@ -27,7 +27,7 @@ function hucreMetni(v: unknown, k: RaporKolon): string {
 export default function Rapor() {
   const { kod = '' } = useParams()
   const [tanim, setTanim] = useState<RaporTanimi | null | undefined>(undefined)
-  const [araclar, setAraclar] = useState<AracKonum[]>([])
+  const [araclar, setAraclar] = useState<{ id: number; plaka: string }[]>([])
   const [tekArac, setTekArac] = useState<number | null>(null)
   const [cokAraclar, setCokAraclar] = useState<Set<number>>(new Set())
   const [baslangic, setBaslangic] = useState(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return yerelGirdi(d) })
@@ -43,7 +43,13 @@ export default function Rapor() {
   const [filtre, setFiltre] = useState('')
   const [siralama, setSiralama] = useState<{ ad: string; artan: boolean } | null>(null)
 
-  useEffect(() => { api.araclar().then(setAraclar).catch(() => { /* boş liste */ }) }, [])
+  // Gider raporlarında yalnız gider takibi açık araçlar (eski fms formları gibi).
+  const gider = tanim?.gider ?? false
+  useEffect(() => {
+    if (tanim === undefined) return
+    setTekArac(null); setCokAraclar(new Set())
+    ;(gider ? api.giderAraclari() : api.araclar()).then(setAraclar).catch(() => { /* boş liste */ })
+  }, [gider, tanim === undefined]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     setTanim(undefined); setSonuc(null); setHata(null); setFiltre(''); setSiralama(null)
@@ -52,6 +58,8 @@ export default function Rapor() {
       setTanim(t)
       if (t) {
         setEkstra(Object.fromEntries(t.parametreler.map(p => [p.ad, p.varsayilan ?? ''])))
+        // Gider raporları eskisi gibi yılbaşından başlar.
+        if (t.gider) { const d = new Date(); setBaslangic(yerelGirdi(new Date(d.getFullYear(), 0, 1))) }
         for (const p of t.parametreler.filter(x => x.kaynak)) {
           api.raporSecenekleri(p.kaynak!).then(s => setDinamik(d => ({ ...d, [p.kaynak!]: s }))).catch(() => { /* yalnız sabit seçenekler kalır */ })
         }

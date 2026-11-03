@@ -142,6 +142,8 @@ export type RaporTanimi = {
   arac: 'yok' | 'tek' | 'cok'
   tarih: 'yok' | 'aralik' | 'ay'
   azamiGun: number
+  /** Gider Yönetimi raporu: araçlar giderAraclari() listesinden. */
+  gider: boolean
   parametreler: RaporParametre[]
 }
 

@@ -21,6 +21,14 @@ public static class RaporEndpoints
         ORDER BY c.PLAKA
         """;
 
+    // Gider raporlarında: kullanıcının gider takibi açık araçları (eski fms formlarındaki liste).
+    private const string GiderAraclari = """
+        SELECT c.ID, c.CIHAZID, c.PLAKA FROM clients c WITH (NOLOCK)
+        JOIN userclients u WITH (NOLOCK) ON u.CLIENTID = c.ID AND u.USERID = @kullaniciId
+        WHERE c.STATUS = 1 AND c.FMS = 1
+        ORDER BY c.PLAKA
+        """;
+
     // Seçim listeleri (eski _forms_raporX.asp'lerdeki DB'den dolan select'ler). Hepsi kullanıcıya göre süzülür.
     private const string KatmanKosulu = "(l.USERID = @kullaniciId OR (l.SUBUSERS = 1 AND l.USERID = (SELECT GROUPID FROM users WITH (NOLOCK) WHERE ID = @kullaniciId)))";
     private static readonly Dictionary<string, string> SecenekSorgulari = new(StringComparer.OrdinalIgnoreCase)
@@ -61,6 +69,7 @@ public static class RaporEndpoints
                 arac = r.Arac.ToString().ToLowerInvariant(),
                 tarih = r.Tarih.ToString().ToLowerInvariant(),
                 azamiGun = r.AzamiGun,
+                gider = r.Gider,
                 parametreler = r.Parametreler,
             }));
         });
@@ -69,17 +78,17 @@ public static class RaporEndpoints
         {
             var k = await oturum.KullaniciAlAsync(http.User, ct);
             if (k is null) return Results.Unauthorized();
-            if (!k.Raporlar && !kod.Equals("report_last", StringComparison.OrdinalIgnoreCase))
-                return Results.Json(new { error = "Rapor yetkiniz yok." }, statusCode: StatusCodes.Status403Forbidden);
             if (!RaporKaydi.Tumu.TryGetValue(kod, out var rapor))
                 return Results.NotFound(new { error = "Bu rapor yeni arayüze henüz taşınmadı." });
+            if (rapor.Gider ? !k.GiderYonetimi : !k.Raporlar && !kod.Equals("report_last", StringComparison.OrdinalIgnoreCase))
+                return Results.Json(new { error = "Rapor yetkiniz yok." }, statusCode: StatusCodes.Status403Forbidden);
 
             var q = http.Request.Query;
 
             // Araçlar: yalnızca kullanıcının erişebildikleri; "tumu" ya da boş → hepsi (çoklu raporlarda).
             var istenen = (q["araclar"].ToString() ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Select(x => int.TryParse(x, out var n) ? n : 0).Where(n => n > 0).ToHashSet();
-            var erisilen = (await db.SorguAsync(ErisilenAraclar, new Dictionary<string, object?> { ["kullaniciId"] = k.Id }, ct))
+            var erisilen = (await db.SorguAsync(rapor.Gider ? GiderAraclari : ErisilenAraclar, new Dictionary<string, object?> { ["kullaniciId"] = k.Id }, ct))
                 .Select(s => new RaporAraci(Convert.ToInt32(s["ID"]), (s["CIHAZID"] as string ?? "").Trim(), (s["PLAKA"] as string ?? "").Trim()))
                 .ToList();
             var araclar = rapor.Arac == AracSecimi.Yok ? []
@@ -109,10 +118,15 @@ public static class RaporEndpoints
 
             var ekstra = rapor.Parametreler.ToDictionary(p => p.Ad, p => (string?)(q["p_" + p.Ad].ToString() is { Length: > 0 } v ? v : p.Varsayilan));
 
-            var sonuc = await rapor.CalistirAsync(new RaporIstegi
+            RaporSonuc sonuc;
+            try
             {
-                Kullanici = k, Araclar = araclar, TumAraclar = istenen.Count == 0 && rapor.Arac == AracSecimi.Cok, Baslangic = bas, Bitis = bit, Ay = ay, Ekstra = ekstra,
-            }, db, ct);
+                sonuc = await rapor.CalistirAsync(new RaporIstegi
+                {
+                    Kullanici = k, Araclar = araclar, TumAraclar = istenen.Count == 0 && rapor.Arac == AracSecimi.Cok, Baslangic = bas, Bitis = bit, Ay = ay, Ekstra = ekstra,
+                }, db, ct);
+            }
+            catch (RaporHatasi h) { return Results.BadRequest(new { error = h.Message }); }
 
             return Results.Ok(new { kod = rapor.Kod, baslik = rapor.Baslik, sonuc.Kolonlar, sonuc.Satirlar, sonuc.Ozet });
         });

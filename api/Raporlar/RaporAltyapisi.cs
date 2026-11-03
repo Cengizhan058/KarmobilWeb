@@ -35,6 +35,9 @@ public sealed record RaporSonuc(
     IReadOnlyList<Dictionary<string, object?>> Satirlar,
     string? Ozet = null);
 
+/// <summary>Rapor girdisi geçersiz (ör. hiç tür seçilmemiş); uç bunu 400 ve mesajla döner.</summary>
+public sealed class RaporHatasi(string mesaj) : Exception(mesaj);
+
 /// <summary>Kullanıcının seçtiği ve erişimi doğrulanmış araç.</summary>
 public sealed record RaporAraci(int Id, string CihazId, string Plaka);
 
@@ -72,6 +75,8 @@ public interface IRapor
     /// <summary>Tarih aralığı için gün sınırı (eski rLimit); 0 = sınırsız.</summary>
     int AzamiGun { get; }
     IReadOnlyList<RaporParametre> Parametreler { get; }
+    /// <summary>Gider Yönetimi raporu: araçlar yalnız gider takibi açık (clients.FMS = 1) olanlar, rapor yetkisi yerine gider yetkisi aranır.</summary>
+    bool Gider => false;
     Task<RaporSonuc> CalistirAsync(RaporIstegi istek, SqlDb db, CancellationToken ct);
 }
 
