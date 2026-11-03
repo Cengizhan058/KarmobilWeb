@@ -205,7 +205,7 @@ export default function Gecmis() {
               </select>
               {sn && <span className="oynatici-bilgi"><strong>{sn.hiz} km/s</strong> · {tam.format(new Date(sn.zaman))} · {sn.durum}{sn.adres ? ` · ${sn.adres}` : ''}</span>}
             </div>
-            <div className="hiz-lejant"><span style={{ background: '#2fa36b' }} />0–49 <span style={{ background: '#e0a526' }} />50–89 <span style={{ background: '#d9534f' }} />90+ km/s · {ozet?.uzunDurak ?? 0} duraklama</div>
+            <div className="hiz-lejant"><span style={{ background: '#2fa36b' }} />0–49 <span style={{ background: '#e0a526' }} />50–89 <span style={{ background: '#d9534f' }} />90+ km/s <span className="kesik" />veri yok · {ozet?.uzunDurak ?? 0} duraklama</div>
           </div>
         )}
 

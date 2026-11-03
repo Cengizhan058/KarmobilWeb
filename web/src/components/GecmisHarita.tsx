@@ -7,6 +7,11 @@ import { sure } from '../lib/arac.ts'
 const saat = new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short', timeStyle: 'short' })
 
 // Hız bandına göre rota rengi.
+// Bu süreden uzun kayıt gelmeyen ve araç bu mesafeden fazla yer değiştiren aralık "veri yok" olarak kesikli çizilir.
+const BOSLUK_SANIYE = 120
+const BOSLUK_METRE = 300
+const VERI_YOK_RENGI = '#8a919e'
+
 const hizRengi = (h: number) => (h >= 90 ? '#d9534f' : h >= 50 ? '#e0a526' : '#2fa36b')
 
 const kucukIkon = (sinif: string, yazi: string) =>
@@ -61,17 +66,21 @@ type Props = {
 }
 
 export default function GecmisHarita({ noktalar, duraklar, durakEsikDakika, seciliIndeks, kaydirIstegi }: Props) {
-  // Aynı renkteki ardışık noktalar tek çizgi olsun (binlerce küçük çizgi yerine). Sapma işaretli kayıtlar çizilmez.
+  // Aynı renkteki ardışık noktalar tek çizgi olsun (binlerce küçük çizgi yerine). Sapma işaretli kayıtlar çizilmez;
+  // uzun veri boşlukları ayrı, kesikli gri parça olur (araç o arada gerçekte yolu izledi ama kayıt yok).
   const cizilen = useMemo(() => noktalar.filter(n => !n.sapma), [noktalar])
   const parcalar = useMemo(() => {
-    const sonuc: { renk: string; yol: [number, number][] }[] = []
+    const sonuc: { renk: string; kesik: boolean; yol: [number, number][] }[] = []
     for (let i = 1; i < cizilen.length; i++) {
-      const renk = hizRengi(cizilen[i].hiz)
-      const a: [number, number] = [cizilen[i - 1].lat, cizilen[i - 1].lon]
-      const b: [number, number] = [cizilen[i].lat, cizilen[i].lon]
+      const p = cizilen[i - 1], q = cizilen[i]
+      const a: [number, number] = [p.lat, p.lon]
+      const b: [number, number] = [q.lat, q.lon]
+      const kesik = (new Date(q.zaman).getTime() - new Date(p.zaman).getTime()) / 1000 > BOSLUK_SANIYE
+        && L.latLng(a).distanceTo(b) > BOSLUK_METRE
+      const renk = kesik ? VERI_YOK_RENGI : hizRengi(q.hiz)
       const son = sonuc[sonuc.length - 1]
-      if (son && son.renk === renk) son.yol.push(b)
-      else sonuc.push({ renk, yol: [a, b] })
+      if (son && son.renk === renk && son.kesik === kesik && !kesik) son.yol.push(b)
+      else sonuc.push({ renk, kesik, yol: [a, b] })
     }
     return sonuc
   }, [cizilen])
@@ -90,7 +99,11 @@ export default function GecmisHarita({ noktalar, duraklar, durakEsikDakika, seci
       <SeciliyeKaydir nokta={secili} takip={kaydirIstegi} />
 
       {parcalar.map((p, i) => (
-        <Polyline key={i} positions={p.yol} pathOptions={{ color: p.renk, weight: 5, opacity: .9 }} />
+        <Polyline key={i} positions={p.yol} pathOptions={p.kesik
+          ? { color: p.renk, weight: 3, opacity: .9, dashArray: '6 8' }
+          : { color: p.renk, weight: 5, opacity: .9 }}>
+          {p.kesik && <Tooltip sticky>Bu aralıkta cihazdan kayıt gelmedi</Tooltip>}
+        </Polyline>
       ))}
 
       {gorunenDuraklar.map(d => (

@@ -420,6 +420,7 @@ input { font: inherit; }
 .oynatici-bilgi { flex-basis: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--yazi-2); font-size: 13px; }
 .hiz-lejant { position: absolute; left: 12px; top: 12px; z-index: 600; display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 8px; background: var(--yuzey); box-shadow: 0 2px 8px rgba(0,0,0,.2); font-size: 12px; color: var(--yazi-2); }
 .hiz-lejant span { width: 14px; height: 4px; border-radius: 2px; }
+.hiz-lejant span.kesik { height: 0; border-radius: 0; border-top: 3px dashed #8a919e; margin-left: 6px; }
 
 .gecmis-isaret div {
   display: grid; place-items: center;
