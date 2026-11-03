@@ -7,7 +7,7 @@ namespace Karmobil.Api.Endpoints;
 
 /// <summary>
 /// Ruhsat bilgileri (eski data/_ruhsatBilgileri.asp), mesai saatleri (_getWorkHours / _prcWorkHours) ve
-/// RF-ID sürücü kartları (_getRfIdCards / _prcRFID).
+/// RF-ID sürücü kartları (_getRfIdCards / _prcRFID), şifre değiştirme (_prcSetUserPwd.asp).
 /// Eski ruhsat ucunda sahiplik denetimi yoktu (her aracın ruhsatı okunup yazılabiliyordu); burada userclients ile sınırlı.
 /// </summary>
 public static partial class AyarEndpoints
@@ -54,6 +54,11 @@ public static partial class AyarEndpoints
         ("RUHSAT_BELGESERI", "Belge seri", 50),
     ];
 
+    // Eskisi gibi mevcut şifre tutmazsa güncellemez (şifreler düz metin; eski site ve mobil giriş öyle doğruluyor).
+    private const string SifreDegistir = "UPDATE users SET PASSWORD = @yeni WHERE ID = @kullaniciId AND PASSWORD = @mevcut";
+
+    public sealed record SifreIstegi(string? Mevcut, string? Yeni);
+
     private const string SahipKosulu = "c.STATUS = 1 AND c.ID = @id AND c.ID IN (SELECT CLIENTID FROM userclients WHERE USERID = @kullaniciId)";
     private static readonly string RuhsatOku =
         $"SELECT c.PLAKA, {string.Join(", ", RuhsatAlanlari.Select(a => "c." + a.Kolon))} FROM clients c WITH (NOLOCK) WHERE {SahipKosulu}";
@@ -89,6 +94,16 @@ public static partial class AyarEndpoints
         var g = app.MapGroup("/api/ayarlar").WithTags("Ayarlar").RequireAuthorization();
 
         // ---- Ruhsat ----
+        g.MapPut("/sifre", (SifreIstegi i, HttpContext h, OturumServisi o, SqlDb db, CancellationToken ct) => Kullanici(h, o, ct, async k =>
+        {
+            if (!k.KullaniciAyarlari) return Yasak();
+            if (string.IsNullOrEmpty(i.Mevcut)) return Hata("Mevcut şifrenizi giriniz.");
+            if (i.Yeni is not { Length: >= 6 and <= 150 }) return Hata("Yeni şifre en az 6 karakter olmalı.");
+            if (i.Yeni == i.Mevcut) return Hata("Yeni şifre mevcut şifreyle aynı.");
+            var n = await db.CalistirAsync(SifreDegistir, new Dictionary<string, object?> { ["kullaniciId"] = k.Id, ["mevcut"] = i.Mevcut, ["yeni"] = i.Yeni }, ct);
+            return n == 1 ? Results.Ok(new { mesaj = "Şifre güncellendi." }) : Hata("Mevcut şifrenizi hatalı girdiniz.");
+        }));
+
         g.MapGet("/ruhsat-alanlari", () => Results.Ok(RuhsatAlanlari.Select(a => new { ad = a.Kolon, baslik = a.Baslik, uz = a.Uz })));
 
         g.MapGet("/ruhsat/{id:int}", (int id, HttpContext h, OturumServisi o, SqlDb db, CancellationToken ct) => Kullanici(h, o, ct, async k =>

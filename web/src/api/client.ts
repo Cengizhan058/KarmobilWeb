@@ -283,6 +283,16 @@ export const api = {
     istek<{ id?: number; mesaj: string }>(id ? `/api/giderler/${tur}/${id}` : `/api/giderler/${tur}`, { method: id ? 'PUT' : 'POST', body: JSON.stringify({ aracId, alanlar }) }),
   giderSil: (tur: string, id: number) => istek<{ mesaj: string }>(`/api/giderler/${tur}/${id}`, { method: 'DELETE' }),
   cihazSagligi: () => istek<CihazSagligi>('/api/yonetim/cihaz-sagligi'),
+  motorBlokaj: (aracId: number, kilitle: boolean) =>
+    istek<{ mesaj: string }>(`/api/araclar/${aracId}/motor-blokaj`, { method: 'POST', body: JSON.stringify({ kilitle }) }),
+  cihazProgrami: (aracId: number) => istek<CihazProgrami[]>(`/api/cihaz/program/${aracId}`),
+  cihazProgramGonder: (araclar: number[], komutlar: { kod: string; durum: number; deger: number | null }[]) =>
+    istek<{ mesaj: string }>('/api/cihaz/program', { method: 'PUT', body: JSON.stringify({ araclar, komutlar }) }),
+  akilliBlokaj: (aracId: number) => istek<{ bas: string | null; bit: string | null }[]>(`/api/cihaz/akilli-blokaj/${aracId}`),
+  akilliBlokajKaydet: (araclar: number[], gunler: { bas: string | null; bit: string | null }[]) =>
+    istek<{ mesaj: string }>('/api/cihaz/akilli-blokaj', { method: 'PUT', body: JSON.stringify({ araclar, gunler }) }),
+  sifreDegistir: (mevcut: string, yeni: string) =>
+    istek<{ mesaj: string }>('/api/ayarlar/sifre', { method: 'PUT', body: JSON.stringify({ mevcut, yeni }) }),
   altKullanicilar: () => istek<AltKullaniciListesi>('/api/alt-kullanicilar'),
   altKullaniciAraclari: (id: number) => istek<number[]>(`/api/alt-kullanicilar/${id}/araclar`),
   altKullaniciKaydet: (id: number | null, k: { kullaniciAdi: string; sifre: string | null; yetkiler: AltYetkiler; araclar: number[] }) =>
@@ -350,3 +360,5 @@ export type AltKullaniciListesi = {
   verilebilir: AltYetkiler
   kullanicilar: { id: number; kullaniciAdi: string; yetkiler: AltYetkiler; aracSayisi: number }[]
 }
+
+export type CihazProgrami = { kod: string; baslik: string; birim: string; min: number; durum: number; deger: number | null; bekliyor: boolean; tarih: string | null }

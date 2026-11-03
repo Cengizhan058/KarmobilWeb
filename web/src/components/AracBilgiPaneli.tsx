@@ -24,7 +24,8 @@ export default function AracBilgiPaneli({ arac, takipte, onTakip, onYaklas, onKa
   const [detay, setDetay] = useState<AracDetay | null>(null)
   const [hata, setHata] = useState<string | null>(null)
   const [bildirim, setBildirim] = useState<string | null>(null)
-  const [onay, setOnay] = useState(false)
+  // Onay bekleyen cihaz komutu: anlık konum ya da motor kilitle / aç.
+  const [onay, setOnay] = useState<'konum' | 'kilitle' | 'ac' | null>(null)
   const [gonderiyor, setGonderiyor] = useState(false)
 
   // Detay (sahip, ruhsat, son kontak/alarm) araç değişince ve son sinyal değişince yeniden alınır.
@@ -37,7 +38,7 @@ export default function AracBilgiPaneli({ arac, takipte, onTakip, onYaklas, onKa
     return () => { iptal = true }
   }, [arac.id, arac.sinyalTarihi])
 
-  useEffect(() => { setSekme('genel'); setOnay(false); setBildirim(null) }, [arac.id])
+  useEffect(() => { setSekme('genel'); setOnay(null); setBildirim(null) }, [arac.id])
 
   useEffect(() => {
     if (!bildirim) return
@@ -45,16 +46,17 @@ export default function AracBilgiPaneli({ arac, takipte, onTakip, onYaklas, onKa
     return () => clearTimeout(t)
   }, [bildirim])
 
-  const anlikKonum = async () => {
+  const komutGonder = async () => {
+    if (!onay) return
     setGonderiyor(true)
     try {
-      const r = await api.anlikKonumIste(arac.id)
+      const r = onay === 'konum' ? await api.anlikKonumIste(arac.id) : await api.motorBlokaj(arac.id, onay === 'kilitle')
       setBildirim(r.mesaj)
     } catch (e) {
       setBildirim(e instanceof Error ? e.message : 'İstek gönderilemedi.')
     } finally {
       setGonderiyor(false)
-      setOnay(false)
+      setOnay(null)
     }
   }
 
@@ -96,7 +98,12 @@ export default function AracBilgiPaneli({ arac, takipte, onTakip, onYaklas, onKa
       <div className="bilgi-eylemler">
         <button onClick={onYaklas}><Crosshair size={16} />Yakınlaştır</button>
         <button className={takipte ? 'etkin' : ''} onClick={onTakip}><Navigation size={16} />{takipte ? 'Takibi bırak' : 'Takip et'}</button>
-        <button onClick={() => setOnay(true)} disabled={gonderiyor}><Radio size={16} />Anlık konum</button>
+        <button onClick={() => setOnay('konum')} disabled={gonderiyor}><Radio size={16} />Anlık konum</button>
+        {detay?.motorBlokaj && (
+          <button onClick={() => setOnay(detay.motorBlokaj === 'aktif' ? 'ac' : 'kilitle')} disabled={gonderiyor}>
+            {detay.motorBlokaj === 'aktif' ? <><LockOpen size={16} />Motoru aç</> : <><Lock size={16} />Motoru kilitle</>}
+          </button>
+        )}
         <button onClick={() => navigate(`/gecmis?arac=${arac.id}`)}><History size={16} />Geçmiş</button>
         {detay?.dvrAdresi && (
           <a className="dugme" href={`http://${detay.dvrAdresi}`} target="_blank" rel="noreferrer"><Video size={16} />Kamera</a>
@@ -105,10 +112,16 @@ export default function AracBilgiPaneli({ arac, takipte, onTakip, onYaklas, onKa
 
       {onay && (
         <div className="onay-kutu">
-          <p>Araca konum gönder komutu iletilecek. Devam edilsin mi?</p>
+          <p>
+            {onay === 'konum' && 'Araca konum gönder komutu iletilecek. Devam edilsin mi?'}
+            {onay === 'ac' && 'Araca motoru açma (blokajı kaldırma) komutu iletilecek. Devam edilsin mi?'}
+            {onay === 'kilitle' && <>Araca motor kilitleme komutu iletilecek. {arac.hiz > 0
+              ? <strong className="kirmizi">Araç şu an {Math.round(arac.hiz)} km/s ile hareket ediyor; seyir halinde motorun durması tehlikeli olabilir.</strong>
+              : 'Devam edilsin mi?'}</>}
+          </p>
           <div>
-            <button className="ana-dugme kucuk" onClick={anlikKonum} disabled={gonderiyor}>{gonderiyor ? 'Gönderiliyor…' : 'Gönder'}</button>
-            <button className="ikincil-dugme" onClick={() => setOnay(false)}>Vazgeç</button>
+            <button className="ana-dugme kucuk" onClick={komutGonder} disabled={gonderiyor}>{gonderiyor ? 'Gönderiliyor…' : 'Gönder'}</button>
+            <button className="ikincil-dugme" onClick={() => setOnay(null)}>Vazgeç</button>
           </div>
         </div>
       )}

@@ -22,6 +22,9 @@ import Dvr from './pages/Dvr.tsx'
 import Destek from './pages/Destek.tsx'
 import BildirimAyarlari from './pages/BildirimAyarlari.tsx'
 import AltKullanicilar from './pages/AltKullanicilar.tsx'
+import SifreDegistir from './pages/SifreDegistir.tsx'
+import CihazProgramlama from './pages/CihazProgramlama.tsx'
+import AkilliBlokaj from './pages/AkilliBlokaj.tsx'
 
 export default function App() {
   return (
@@ -46,6 +49,9 @@ export default function App() {
         <Route path="dvr" element={<Dvr />} />
         <Route path="bildirim-ayarlari" element={<BildirimAyarlari />} />
         <Route path="alt-kullanicilar" element={<AltKullanicilar />} />
+        <Route path="sifre" element={<SifreDegistir />} />
+        <Route path="cihaz-programlama" element={<CihazProgramlama />} />
+        <Route path="akilli-blokaj" element={<AkilliBlokaj />} />
         <Route path="destek" element={<Destek />} />
         <Route path="yapim/:id" element={<YapimAsamasinda />} />
       </Route>

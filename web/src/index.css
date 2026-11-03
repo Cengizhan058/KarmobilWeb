@@ -726,3 +726,4 @@ textarea.secim { height: auto; padding: 8px 10px; resize: vertical; }
 .degisti-etiket { font-weight: 400; }
 .bolge-secimi summary { cursor: pointer; color: var(--vurgu); }
 .bolge-secimi > div { max-height: 180px; overflow-y: auto; padding: 6px 0; }
+.sifre-kart { max-width: 380px; }

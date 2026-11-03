@@ -49,13 +49,13 @@ export const MENU: MenuMaddesi[] = [
   { id: 'dvrlist', ad: 'DVR-Kamera', ikon: Video, goster: k => k.dvrVar, yol: '/dvr' },
   {
     id: 'ayarlar', ad: 'Ayarlar', ikon: Settings, alt: [
-      { id: 'pwd_settings', ad: 'Şifre / Parola Ayarları', ikon: KeyRound, goster: k => k.kullaniciAyarlari },
+      { id: 'pwd_settings', ad: 'Şifre / Parola Ayarları', ikon: KeyRound, goster: k => k.kullaniciAyarlari, yol: '/sifre' },
       { id: 'sub_users', ad: 'Kullanıcı Yetkilendirme', ikon: ShieldCheck, goster: k => k.kullaniciAyarlari && k.altKullaniciLimiti > 0, yol: '/alt-kullanicilar' },
       { id: 'rfid_management', ad: 'RF-ID Kart Yönetimi', ikon: BadgeCheck, yol: '/rfid' },
       { id: 'work_hours', ad: 'Mesai Saatleri', ikon: Clock, yol: '/mesai-saatleri' },
-      { id: 'smart_block', ad: 'Akıllı Motor Blokaj', ikon: Ban, goster: k => k.akilliBlokaj },
+      { id: 'smart_block', ad: 'Akıllı Motor Blokaj', ikon: Ban, goster: k => k.akilliBlokaj, yol: '/akilli-blokaj' },
       { id: 'alarm_settings', ad: 'Bildirim Ayarları', ikon: Bell, yol: '/bildirim-ayarlari' },
-      { id: 'device_settings', ad: 'Cihaz Programlama', ikon: Cpu, goster: k => k.cihazProgramlama },
+      { id: 'device_settings', ad: 'Cihaz Programlama', ikon: Cpu, goster: k => k.cihazProgramlama, yol: '/cihaz-programlama' },
       { id: 'program_table', ad: 'Mevcut Program Tablosu', ikon: Table, goster: k => k.cihazProgramlama, yol: '/liste/program-tablosu' },
       { id: 'blokeliaraclar', ad: 'Motor Blokesi Aktif Araçlar', ikon: Lock, goster: k => k.cihazProgramlama, yol: '/liste/blokeli-araclar' },
       { id: 'cihazkomut_logs', ad: 'Cihaz Programlama Geçmişi', ikon: History, goster: k => k.cihazProgramlama, yol: '/rapor/cihazkomut_logs' },
