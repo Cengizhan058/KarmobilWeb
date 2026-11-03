@@ -73,7 +73,9 @@ public sealed record GecmisNoktaDto(
     string? Adres,
     string? Surucu,
     double? Isi,
-    double? KadranKm);
+    double? KadranKm,
+    // Fiziksel olarak imkânsız sıçrama (yanlış saatli / hatalı konumlu kayıt): tabloda kalır, çizgiye girmez.
+    bool Sapma = false);
 
 public sealed record DuraklamaDto(DateTime Baslangic, DateTime Bitis, int Dakika, double Lat, double Lon, string? Adres, bool Kontak);
 

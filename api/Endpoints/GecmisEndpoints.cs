@@ -43,7 +43,9 @@ public static class GecmisEndpoints
                 ["kullaniciId"] = k.Id,
             };
 
-            var satirlar = await db.SorguAsync(poi == true ? Sql.GecmisKonumlarPoi : Sql.GecmisKonumlar, p, ct);
+            // Yordam yalnız TARIH'e göre sıralar; aynı saniyedeki kayıtlar veritabanına giriş sırasıyla (ID) dizilir.
+            var satirlar = (await db.SorguAsync(poi == true ? Sql.GecmisKonumlarPoi : Sql.GecmisKonumlar, p, ct))
+                .OrderBy(s => (DateTime)s["TARIH"]!).ThenBy(s => Convert.ToInt64(s["ID"], CultureInfo.InvariantCulture)).ToList();
             var mesafe = await db.TekDegerAsync<object>(Sql.AralikMesafe, p, ct);
 
             var noktalar = new List<GecmisNoktaDto>(satirlar.Count);
@@ -84,6 +86,8 @@ public static class GecmisEndpoints
                     KadranKm: s["kadranm"] is null ? null : Convert.ToDouble(s["kadranm"], CultureInfo.InvariantCulture)));
             }
 
+            SapmalariIsaretle(noktalar);
+
             return Results.Ok(new GecmisDto(
                 AracId: aracId,
                 Plaka: (arac["PLAKA"] as string ?? "").Trim(),
@@ -112,6 +116,56 @@ public static class GecmisEndpoints
     };
 
     // Ardışık hız=0 kayıtları bir duraklama; eski "X dakika durdu" satırının karşılığı.
+    private const int AzamiArdisikSapma = 2;
+    private const double SicramaMetre = 1500;
+
+    /// <summary>
+    /// Sıçrama kayıtlarını işaretler: 1-2 ardışık nokta hem önceki hem sonraki geçerli noktaya en az 1,5 km uzaksa ve bu
+    /// iki komşu birbirine yakınsa (aradaki dolambacın %35'inden kısa) bu noktalar sapmadır. Cihaz bazı kayıtları yanlış
+    /// saat ya da eski konumla gönderiyor; zamana göre sıralanınca eski sitede de haritada zikzak çiziyordu.
+    /// Kayıt saatleri güvenilmez olduğundan (toplu gönderimde saniye içinde sıkışıyor) yalnız konuma bakılır;
+    /// üç ve daha uzun gidiş-dönüşler gerçek yol olabileceği için dokunulmaz.
+    /// </summary>
+    private static void SapmalariIsaretle(List<GecmisNoktaDto> n)
+    {
+        var onceki = 0; // son geçerli nokta
+        for (var i = 1; i < n.Count - 1; i++)
+        {
+            var a = n[onceki];
+            var bulundu = false;
+            for (var uz = 1; uz <= AzamiArdisikSapma && i + uz < n.Count; uz++)
+            {
+                var son = n[i + uz];
+                var uzak = true;
+                double yol = Mesafe(a.Lat, a.Lon, n[i].Lat, n[i].Lon);
+                for (var x = i; x < i + uz; x++)
+                {
+                    uzak &= Mesafe(a.Lat, a.Lon, n[x].Lat, n[x].Lon) >= SicramaMetre && Mesafe(son.Lat, son.Lon, n[x].Lat, n[x].Lon) >= SicramaMetre;
+                    yol += Mesafe(n[x].Lat, n[x].Lon, n[x + 1].Lat, n[x + 1].Lon);
+                }
+                if (uzak && Mesafe(a.Lat, a.Lon, son.Lat, son.Lon) <= yol * 0.35)
+                {
+                    for (var x = i; x < i + uz; x++) n[x] = n[x] with { Sapma = true };
+                    i += uz;            // dönülen nokta geçerli
+                    onceki = i;
+                    bulundu = true;
+                    break;
+                }
+            }
+            if (!bulundu) onceki = i;
+        }
+    }
+
+    private static double Mesafe(double lat1, double lon1, double lat2, double lon2)
+    {
+        const double R = 6371000;
+        double Rad(double d) => d * Math.PI / 180;
+        var dLat = Rad(lat2 - lat1);
+        var dLon = Rad(lon2 - lon1);
+        var h = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) + Math.Cos(Rad(lat1)) * Math.Cos(Rad(lat2)) * Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+        return 2 * R * Math.Asin(Math.Min(1, Math.Sqrt(h)));
+    }
+
     private static List<DuraklamaDto> Duraklar(List<GecmisNoktaDto> noktalar)
     {
         var sonuc = new List<DuraklamaDto>();

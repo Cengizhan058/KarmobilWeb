@@ -120,6 +120,8 @@ export type GecmisNokta = {
   surucu: string | null
   isi: number | null
   kadranKm: number | null
+  /** Yanlış saatli / hatalı konumlu kayıt: tabloda gösterilir, rota çizgisine girmez. */
+  sapma: boolean
 }
 
 export type Duraklama = { baslangic: string; bitis: string; dakika: number; lat: number; lon: number; adres: string | null; kontak: boolean }

@@ -61,19 +61,20 @@ type Props = {
 }
 
 export default function GecmisHarita({ noktalar, duraklar, durakEsikDakika, seciliIndeks, kaydirIstegi }: Props) {
-  // Aynı renkteki ardışık noktalar tek çizgi olsun (binlerce küçük çizgi yerine).
+  // Aynı renkteki ardışık noktalar tek çizgi olsun (binlerce küçük çizgi yerine). Sapma işaretli kayıtlar çizilmez.
+  const cizilen = useMemo(() => noktalar.filter(n => !n.sapma), [noktalar])
   const parcalar = useMemo(() => {
     const sonuc: { renk: string; yol: [number, number][] }[] = []
-    for (let i = 1; i < noktalar.length; i++) {
-      const renk = hizRengi(noktalar[i].hiz)
-      const a: [number, number] = [noktalar[i - 1].lat, noktalar[i - 1].lon]
-      const b: [number, number] = [noktalar[i].lat, noktalar[i].lon]
+    for (let i = 1; i < cizilen.length; i++) {
+      const renk = hizRengi(cizilen[i].hiz)
+      const a: [number, number] = [cizilen[i - 1].lat, cizilen[i - 1].lon]
+      const b: [number, number] = [cizilen[i].lat, cizilen[i].lon]
       const son = sonuc[sonuc.length - 1]
       if (son && son.renk === renk) son.yol.push(b)
       else sonuc.push({ renk, yol: [a, b] })
     }
     return sonuc
-  }, [noktalar])
+  }, [cizilen])
 
   const gorunenDuraklar = duraklar.filter(d => d.dakika >= durakEsikDakika)
   const secili = seciliIndeks != null ? noktalar[seciliIndeks] : null
@@ -85,7 +86,7 @@ export default function GecmisHarita({ noktalar, duraklar, durakEsikDakika, seci
       <ZoomControl position="bottomright" />
       <BoyutYenile />
       <TileLayer url="https://{s}.google.com/vt/hl=tr&x={x}&y={y}&z={z}" subdomains={['mts0', 'mts1', 'mts2', 'mts3']} maxZoom={20} attribution="Google" />
-      <Sigdir noktalar={noktalar} />
+      <Sigdir noktalar={cizilen} />
       <SeciliyeKaydir nokta={secili} takip={kaydirIstegi} />
 
       {parcalar.map((p, i) => (
