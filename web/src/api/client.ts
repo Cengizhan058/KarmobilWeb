@@ -176,6 +176,8 @@ export type AracKaydiIstegi = {
 export type AracKaydi = AracKaydiIstegi & { id: number; cihazId: string; gsm: string | null; cihazTipi: string | null; kadranTarihi: string | null }
 
 export type YonetimGrubu = { id: number; ad: string; ustId: number | null; araclar: number[] }
+export type CihazSorunu = { kod: string; seviye: 'kritik' | 'uyari' | 'bilgi'; baslik: string; ayrinti: string }
+export type CihazSagligi = { toplamArac: number; araclar: { id: number; cihazId: string; plaka: string; sonSinyal: string | null; sorunlar: CihazSorunu[] }[] }
 export type ArizaliArac = { id: number; cihazId: string; plaka: string; sonSinyal: string | null; ilkSinyal: string | null; cihazTipi: string | null; aciklama: string | null }
 
 export type RfidKart = { id: number; kartNo: string; adSoyad: string | null; ehliyetNo: string | null; gsmNo: string | null; kayitTarihi: string | null }
@@ -266,6 +268,7 @@ export const api = {
   grupKaydet: (id: number | null, g: { ad: string; ustId: number | null; araclar: number[] }) =>
     istek<{ id: number; mesaj: string }>(id ? `/api/yonetim/gruplar/${id}` : '/api/yonetim/gruplar', { method: id ? 'PUT' : 'POST', body: JSON.stringify(g) }),
   grupSil: (id: number) => istek<{ mesaj: string }>(`/api/yonetim/gruplar/${id}`, { method: 'DELETE' }),
+  cihazSagligi: () => istek<CihazSagligi>('/api/yonetim/cihaz-sagligi'),
   arizaliAraclar: () => istek<ArizaliArac[]>('/api/yonetim/arizali-araclar'),
   aktifBildirimler: () => istek<Record<string, unknown>[]>('/api/yonetim/aktif-bildirimler'),
   programTablosu: () => istek<Record<string, unknown>[]>('/api/yonetim/program-tablosu'),

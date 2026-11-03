@@ -658,3 +658,4 @@ input { font: inherit; }
 .tablo.duzenlenebilir .secim { height: 32px; min-width: 140px; }
 .tablo.duzenlenebilir .ikincil-dugme { display: inline-flex; align-items: center; gap: 4px; }
 .yonetim-liste .islem-liste input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--vurgu); }
+.saglik-sayaclari { grid-template-columns: repeat(3, minmax(0, 160px)); }

@@ -123,6 +123,31 @@ public static class YonetimEndpoints
         ORDER BY c.PLAKA
         """;
 
+    // Cihaz sağlığı: son 7 günün konumlarından arıza belirtileri (konumlar CIHAZID+TARIH kümelenmiş indeksli, araç başına aralık okunur).
+    // Rapor kodları: E1 = ana enerji kesildi (raportanim "ENERJI ALARMI"), E0 = enerji geldi, F0 = sahte cihaz takıldı.
+    // E0/E1 anlamı veriden doğrulandı: son olayı E0 olan cihazların çoğunda ISITCHARGING = 1.
+    private const string CihazSagligi = """
+        DECLARE @t1 datetime = DATEADD(day, -7, GETDATE());
+        SELECT c.ID, c.CIHAZID, c.PLAKA, c.KONTROLTARIH, dbo.AktifMi(c.KONTROLTARIH) AS AKTIF, c.SKBATTERY, c.ISITCHARGING,
+               CASE WHEN EXISTS (SELECT 1 FROM kadran kd WITH (NOLOCK) WHERE kd.CIHAZID = c.CIHAZID) THEN 1 ELSE 0 END AS KADRANVAR,
+               s.ADET, s.HAREKETLI, s.KONTAKACIK, s.MESAFEDEGISTI, s.KESINTI, s.SAHTE, e.RAPORKODU AS SONENERJI, e.TARIH AS SONENERJITARIH
+        FROM clients c WITH (NOLOCK)
+        JOIN userclients u WITH (NOLOCK) ON u.CLIENTID = c.ID AND u.USERID = @kullaniciId
+        OUTER APPLY (
+            SELECT COUNT(*) AS ADET,
+                   SUM(CASE WHEN k.HIZ >= 20 THEN 1 ELSE 0 END) AS HAREKETLI,
+                   SUM(CASE WHEN k.KONTAK = 1 THEN 1 ELSE 0 END) AS KONTAKACIK,
+                   CASE WHEN MAX(CASE WHEN k.HIZ >= 20 THEN k.MESAFE END) > MIN(CASE WHEN k.HIZ >= 20 THEN k.MESAFE END) THEN 1 ELSE 0 END AS MESAFEDEGISTI,
+                   SUM(CASE WHEN k.RAPORKODU = 'E1' THEN 1 ELSE 0 END) AS KESINTI,
+                   SUM(CASE WHEN k.RAPORKODU = 'F0' THEN 1 ELSE 0 END) AS SAHTE
+            FROM konumlar k WITH (NOLOCK) WHERE k.CIHAZID = c.CIHAZID AND k.TARIH >= @t1) s
+        OUTER APPLY (
+            SELECT TOP 1 k.RAPORKODU, k.TARIH FROM konumlar k WITH (NOLOCK)
+            WHERE k.CIHAZID = c.CIHAZID AND k.TARIH >= DATEADD(day, -30, GETDATE()) AND k.RAPORKODU IN ('E0', 'E1') ORDER BY k.TARIH DESC) e
+        WHERE c.STATUS = 1
+        ORDER BY c.PLAKA
+        """;
+
     // Aktif bildirimler: eski _getAlarmTable.asp (cihazalarm NUM1 > 0). Bölge alarmında (BA) NUM1 1 giriş, 2 çıkış, 3 ikisi; NUM2 bölge kimliği.
     private const string AktifBildirimler = """
         SELECT a.ID, c.PLAKA, a.KOMUT, a.NUM1, a.STR1, a.STR2, r.RAPORADI, b.REGION_NAME
@@ -326,6 +351,20 @@ public static class YonetimEndpoints
         }));
 
         // ---- Arızalı / montajsız araçlar ----
+        g.MapGet("/cihaz-sagligi", (HttpContext h, OturumServisi o, SqlDb db, CancellationToken ct) => Kullanici(h, o, ct, async k =>
+        {
+            var satirlar = await db.SorguAsync(CihazSagligi, P(k), ct);
+            var araclar = satirlar.Select(s => new
+            {
+                id = Convert.ToInt32(s["ID"]),
+                cihazId = Metin(s["CIHAZID"]),
+                plaka = Metin(s["PLAKA"]),
+                sonSinyal = s["KONTROLTARIH"] as DateTime?,
+                sorunlar = CihazSorunlari(s),
+            }).Where(a => a.sorunlar.Count > 0).ToList();
+            return Results.Ok(new { toplamArac = satirlar.Count, araclar });
+        }));
+
         g.MapGet("/arizali-araclar", (HttpContext h, OturumServisi o, SqlDb db, CancellationToken ct) => Kullanici(h, o, ct, async k =>
             Results.Ok((await db.SorguAsync(ArizaliAraclar, P(k), ct)).Select(s => new
             {
@@ -337,6 +376,45 @@ public static class YonetimEndpoints
                 cihazTipi = Metin(s["CIHAZTIPI"]),
                 aciklama = Metin(s["EHLIYETNO"]),
             }))));
+    }
+
+    public sealed record CihazSorunu(string Kod, string Seviye, string Baslik, string Ayrinti);
+
+    // Eşikler: hareketli = 20 km/s ve üstü konum; kontak/km denetimi için 7 günde en az 10 hareketli konum aranır.
+    private static List<CihazSorunu> CihazSorunlari(IReadOnlyDictionary<string, object?> s)
+    {
+        int Sayi(string k) => s[k] is null ? 0 : Convert.ToInt32(s[k]);
+        string Tarih(object? v) => v is DateTime t ? t.ToString("dd.MM.yyyy HH:mm") : "-";
+        var aktif = Sayi("AKTIF") == 1;
+        var enerjiKesik = (s["SONENERJI"] as string)?.Trim() == "E1";
+        var hareketli = Sayi("HAREKETLI");
+        var l = new List<CihazSorunu>();
+
+        if (enerjiKesik && !aktif)
+            l.Add(new("sokme", "kritik", "Enerji kesildi, sinyal yok - cihaz sökülmüş olabilir",
+                $"Enerji kesilme: {Tarih(s["SONENERJITARIH"])}, son sinyal: {Tarih(s["KONTROLTARIH"])}"));
+        else if (enerjiKesik)
+            l.Add(new("enerji", "kritik", "Ana enerji kesik (cihaz kendi bataryasıyla çalışıyor)", $"Enerji kesilme: {Tarih(s["SONENERJITARIH"])}"));
+        // Son 30 günde kesilen sinyal yeni bir olaydır (sökülmüş olabilir); daha eskisi zaten arızalı/montajsız listesinde.
+        else if (!aktif && s["KONTROLTARIH"] is DateTime son && son > DateTime.Now.AddDays(-30))
+            l.Add(new("sinyal", "uyari", "Sinyal kesildi", $"Son sinyal: {Tarih(son)}"));
+        else if (!aktif)
+            l.Add(new("sinyal", "bilgi", "Uzun süredir sinyal yok (arızalı / montajsız)", s["KONTROLTARIH"] is null ? "Hiç sinyal gelmedi" : $"Son sinyal: {Tarih(s["KONTROLTARIH"])}"));
+
+        if (Sayi("SAHTE") > 0)
+            l.Add(new("sahte", "kritik", "Sahte cihaz takıldı alarmı", $"Son 7 günde {Sayi("SAHTE")} kez"));
+        if (Sayi("KESINTI") >= 3)
+            l.Add(new("kesinti", "uyari", "Enerji sık kesiliyor - gevşek bağlantı olabilir", $"Son 7 günde {Sayi("KESINTI")} kesinti"));
+        if (hareketli >= 10 && Sayi("KONTAKACIK") == 0)
+            l.Add(new("kontak", "uyari", "Kontak sinyali gelmiyor",
+                $"Araç hareket ettiği hâlde ({hareketli} hareketli konum, 7 gün) kontak hep kapalı görünüyor; km sayılmayabilir"));
+        if (hareketli >= 10 && Sayi("MESAFEDEGISTI") == 0)
+            l.Add(new("km", "uyari", "Km sayacı ilerlemiyor", $"Araç hareket ettiği hâlde ({hareketli} hareketli konum, 7 gün) cihazın mesafe değeri değişmiyor"));
+        if (Sayi("ISITCHARGING") == 0 && Sayi("SKBATTERY") is >= 0 and <= 20)
+            l.Add(new("batarya", "uyari", "Batarya düşük", $"%{Sayi("SKBATTERY")}"));
+        if (Sayi("KADRANVAR") == 0)
+            l.Add(new("kadran", "bilgi", "Kadran km girilmemiş", "Araç Yönetimi'nden göstergedeki km girilmeli"));
+        return l;
     }
 
     private static async Task<IResult> GrupYaz(int? id, GrupIstegi i, OturumKullanici k, SqlDb db, CancellationToken ct)

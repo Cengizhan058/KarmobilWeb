@@ -7,7 +7,7 @@ import {
   Layers, MapPin, Pentagon, Route, Users, IdCard, List, TriangleAlert, KeyRound,
   ShieldCheck, BadgeCheck, Clock, Ban, Bell, Cpu, Table, Lock, History, CircleAlert,
   CalendarDays, Gauge, Flag, UserCheck, Warehouse, ParkingSquare, Hourglass, Thermometer,
-  Tractor, SlidersHorizontal, Fuel, ClipboardCheck, Receipt, CarFront, FileText, Coins, Tag,
+  Tractor, SlidersHorizontal, Activity, Fuel, ClipboardCheck, Receipt, CarFront, FileText, Coins, Tag,
 } from 'lucide-react'
 import type { OturumKullanici } from '../api/client.ts'
 
@@ -42,6 +42,7 @@ export const MENU: MenuMaddesi[] = [
       { id: 'fms_rb', ad: 'Ruhsat Bilgileri', ikon: IdCard, goster: k => k.aracYonetimi, yol: '/ruhsat' },
       { id: 'arac_listesi', ad: 'Araç Listesi', ikon: List, yol: '/?liste=1' },
       { id: 'pasifarizaaraclar', ad: 'Arızalı / Montajsız Araçlar', ikon: TriangleAlert, yol: '/arizali-araclar' },
+      { id: 'cihaz_sagligi', ad: 'Cihaz Arıza Bildirimleri', ikon: Activity, yol: '/cihaz-sagligi' },
     ],
   },
   { id: 'dvrlist', ad: 'DVR-Kamera', ikon: Video },
