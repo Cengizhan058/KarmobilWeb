@@ -659,3 +659,11 @@ input { font: inherit; }
 .tablo.duzenlenebilir .ikincil-dugme { display: inline-flex; align-items: center; gap: 4px; }
 .yonetim-liste .islem-liste input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--vurgu); }
 .saglik-sayaclari { grid-template-columns: repeat(3, minmax(0, 160px)); }
+
+/* ---------- Gider yönetimi ---------- */
+.tablo td.sag, .tablo th.sag { text-align: right; font-variant-numeric: tabular-nums; }
+.tablo tfoot td { border-top: 2px solid var(--cizgi); background: var(--yuzey-2); }
+.satir-dugmeler { width: 1%; white-space: nowrap; text-align: right; }
+.satir-dugmeler button { display: inline-grid; place-items: center; width: 30px; height: 30px; margin-left: 2px; border: 1px solid var(--cizgi); border-radius: 6px; background: var(--yuzey); color: var(--yazi-2); }
+.satir-dugmeler button:hover { border-color: var(--vurgu); color: var(--vurgu); }
+textarea.secim { height: auto; padding: 8px 10px; resize: vertical; }

@@ -21,6 +21,8 @@ public sealed record OturumKullanici(
     bool Supervisor,
     int AltKullaniciLimiti,
     bool AkilliBlokaj,
+    // Gider takibi açık (clients.FMS = 1) en az bir aracı var mı (eski _menubarge.asp: yoksa Gider Yönetimi kapalı).
+    bool GiderYonetimi,
     HaritaSiniri? HaritaSiniri,
     string? Tema,
     // Görünüm tercihleri (users.GORUNUM / ARACLARIGRUPLA / KOPUKLARIFILTRE).

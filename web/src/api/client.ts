@@ -26,6 +26,8 @@ export type OturumKullanici = {
   etiket: number
   araclariGrupla: boolean
   arizalilariGizle: boolean
+  /** Gider takibi açık (clients.FMS = 1) aracı var mı */
+  giderYonetimi: boolean
 }
 
 export type GorunumAyari = Partial<Pick<OturumKullanici, 'etiket' | 'araclariGrupla' | 'arizalilariGizle'>>
@@ -176,6 +178,9 @@ export type AracKaydiIstegi = {
 export type AracKaydi = AracKaydiIstegi & { id: number; cihazId: string; gsm: string | null; cihazTipi: string | null; kadranTarihi: string | null }
 
 export type YonetimGrubu = { id: number; ad: string; ustId: number | null; araclar: number[] }
+export type GiderAlani = { kolon: string; baslik: string; tip: 'tarih' | 'tarihSaat' | 'metin' | 'not' | 'tamSayi' | 'sayi' | 'tutar' | 'secim'; uz: number; secenekler: string[] | null; zorunlu: boolean }
+export type GiderTuru = { kod: string; baslik: string; tablo: string; alanlar: GiderAlani[] }
+export type GiderKaydi = { id: number; alanlar: Record<string, string | number | null> }
 export type CihazSorunu = { kod: string; seviye: 'kritik' | 'uyari' | 'bilgi'; baslik: string; ayrinti: string }
 export type CihazSagligi = { toplamArac: number; araclar: { id: number; cihazId: string; plaka: string; sonSinyal: string | null; sorunlar: CihazSorunu[] }[] }
 export type ArizaliArac = { id: number; cihazId: string; plaka: string; sonSinyal: string | null; ilkSinyal: string | null; cihazTipi: string | null; aciklama: string | null }
@@ -268,6 +273,12 @@ export const api = {
   grupKaydet: (id: number | null, g: { ad: string; ustId: number | null; araclar: number[] }) =>
     istek<{ id: number; mesaj: string }>(id ? `/api/yonetim/gruplar/${id}` : '/api/yonetim/gruplar', { method: id ? 'PUT' : 'POST', body: JSON.stringify(g) }),
   grupSil: (id: number) => istek<{ mesaj: string }>(`/api/yonetim/gruplar/${id}`, { method: 'DELETE' }),
+  giderTurleri: () => istek<GiderTuru[]>('/api/giderler/turler'),
+  giderAraclari: () => istek<YonetimAraci[]>('/api/giderler/araclar'),
+  giderler: (tur: string, arac: number) => istek<GiderKaydi[]>(`/api/giderler/${tur}?arac=${arac}`),
+  giderKaydet: (tur: string, id: number | null, aracId: number, alanlar: Record<string, string>) =>
+    istek<{ id?: number; mesaj: string }>(id ? `/api/giderler/${tur}/${id}` : `/api/giderler/${tur}`, { method: id ? 'PUT' : 'POST', body: JSON.stringify({ aracId, alanlar }) }),
+  giderSil: (tur: string, id: number) => istek<{ mesaj: string }>(`/api/giderler/${tur}/${id}`, { method: 'DELETE' }),
   cihazSagligi: () => istek<CihazSagligi>('/api/yonetim/cihaz-sagligi'),
   arizaliAraclar: () => istek<ArizaliArac[]>('/api/yonetim/arizali-araclar'),
   aktifBildirimler: () => istek<Record<string, unknown>[]>('/api/yonetim/aktif-bildirimler'),

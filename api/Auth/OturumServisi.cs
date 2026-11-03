@@ -43,6 +43,7 @@ public sealed class OturumServisi(SqlDb db)
             Supervisor: Sayi(s["SUPERVISOR"]) == 1,
             AltKullaniciLimiti: (int)Sayi(s["USERLIMIT"]),
             AkilliBlokaj: Sayi(s["AKILLIBLOKE"]) == 1,
+            GiderYonetimi: Sayi(s["FMSVAR"]) == 1,
             HaritaSiniri: sinir,
             Tema: s["TEMA"] as string,
             Etiket: (int)Math.Clamp(Sayi(s["GORUNUM"]), 0, 3),
