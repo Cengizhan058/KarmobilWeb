@@ -20,6 +20,7 @@ import Gostergeler from './pages/Gostergeler.tsx'
 import Mesajlar from './pages/Mesajlar.tsx'
 import Dvr from './pages/Dvr.tsx'
 import Destek from './pages/Destek.tsx'
+import BildirimAyarlari from './pages/BildirimAyarlari.tsx'
 
 export default function App() {
   return (
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="gostergeler" element={<Gostergeler />} />
         <Route path="mesajlar" element={<Mesajlar />} />
         <Route path="dvr" element={<Dvr />} />
+        <Route path="bildirim-ayarlari" element={<BildirimAyarlari />} />
         <Route path="destek" element={<Destek />} />
         <Route path="yapim/:id" element={<YapimAsamasinda />} />
       </Route>

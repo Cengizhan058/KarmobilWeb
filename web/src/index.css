@@ -361,7 +361,7 @@ input { font: inherit; }
 .onay-kutu p { margin: 0 0 8px; }
 .onay-kutu div { display: flex; gap: 8px; }
 .ana-dugme.kucuk { width: auto; height: 32px; margin: 0; padding: 0 14px; font-size: 13px; }
-.ikincil-dugme { height: 32px; padding: 0 14px; border: 1px solid var(--cizgi); border-radius: 8px; background: var(--yuzey); }
+.ikincil-dugme { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 32px; padding: 0 14px; border: 1px solid var(--cizgi); border-radius: 8px; background: var(--yuzey); }
 .bilgi-bildirim { margin: 10px 14px 0; padding: 8px 12px; border-radius: 8px; background: var(--vurgu-acik); color: var(--vurgu); }
 
 .bilgi-sekmeler { display: flex; gap: 4px; padding: 8px 14px 0; border-bottom: 1px solid var(--cizgi); }
@@ -713,3 +713,16 @@ textarea.secim { height: auto; padding: 8px 10px; resize: vertical; }
 /* Dar ekranda alt menüsü olmayan üst maddeler (Göstergeler, DVR, Mesajlar, Destek) yalnız simge. */
 @media (max-width: 1500px) { .menu-dugme.tekil > span:not(.menu-rozet) { display: none; } }
 .destek-kart a { color: var(--vurgu); text-decoration: none; }
+
+/* ---------- Bildirim ayarları ---------- */
+.izgara-2 legend { display: inline-flex; align-items: center; gap: 6px; }
+.alarm-tablo { width: 100%; }
+.alarm-tablo td { padding-right: 10px; vertical-align: middle; }
+.alarm-tablo .secim { width: auto; min-width: 110px; }
+.alarm-tablo .secim.kisa { width: 120px; min-width: 0; }
+.alarm-tablo .secim.saat { min-width: 0; width: 78px; }
+.alarm-tablo .alarm-deger { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-height: 44px; }
+.alarm-tablo tr.degisti th { color: var(--vurgu); }
+.degisti-etiket { font-weight: 400; }
+.bolge-secimi summary { cursor: pointer; color: var(--vurgu); }
+.bolge-secimi > div { max-height: 180px; overflow-y: auto; padding: 6px 0; }

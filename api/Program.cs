@@ -117,6 +117,7 @@ app.MapYonetim();
 app.MapAyar();
 app.MapGider();
 app.MapGenel();
+app.MapBildirim();
 
 // ---------------------------------------------------------------------------
 // Arayüzün API ile birlikte sunulması (isteğe bağlı)

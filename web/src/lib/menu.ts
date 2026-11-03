@@ -54,7 +54,7 @@ export const MENU: MenuMaddesi[] = [
       { id: 'rfid_management', ad: 'RF-ID Kart Yönetimi', ikon: BadgeCheck, yol: '/rfid' },
       { id: 'work_hours', ad: 'Mesai Saatleri', ikon: Clock, yol: '/mesai-saatleri' },
       { id: 'smart_block', ad: 'Akıllı Motor Blokaj', ikon: Ban, goster: k => k.akilliBlokaj },
-      { id: 'alarm_settings', ad: 'Bildirim Ayarları', ikon: Bell },
+      { id: 'alarm_settings', ad: 'Bildirim Ayarları', ikon: Bell, yol: '/bildirim-ayarlari' },
       { id: 'device_settings', ad: 'Cihaz Programlama', ikon: Cpu, goster: k => k.cihazProgramlama },
       { id: 'program_table', ad: 'Mevcut Program Tablosu', ikon: Table, goster: k => k.cihazProgramlama, yol: '/liste/program-tablosu' },
       { id: 'blokeliaraclar', ad: 'Motor Blokesi Aktif Araçlar', ikon: Lock, goster: k => k.cihazProgramlama, yol: '/liste/blokeli-araclar' },

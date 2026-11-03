@@ -283,6 +283,12 @@ export const api = {
     istek<{ id?: number; mesaj: string }>(id ? `/api/giderler/${tur}/${id}` : `/api/giderler/${tur}`, { method: id ? 'PUT' : 'POST', body: JSON.stringify({ aracId, alanlar }) }),
   giderSil: (tur: string, id: number) => istek<{ mesaj: string }>(`/api/giderler/${tur}/${id}`, { method: 'DELETE' }),
   cihazSagligi: () => istek<CihazSagligi>('/api/yonetim/cihaz-sagligi'),
+  bildirimTanimlari: () => istek<BildirimTanimlari>('/api/bildirim/tanimlar'),
+  bildirimAyarlari: (aracId: number) => istek<AlarmAyari[]>(`/api/bildirim/araclar/${aracId}`),
+  bildirimKaydet: (araclar: number[], alarmlar: AlarmAyari[]) =>
+    istek<{ mesaj: string }>('/api/bildirim', { method: 'PUT', body: JSON.stringify({ araclar, alarmlar }) }),
+  bildirimAlicilari: (tur: 'eposta' | 'sms', acik: boolean, adresler: string[]) =>
+    istek<{ mesaj: string }>(`/api/bildirim/alicilar/${tur}`, { method: 'PUT', body: JSON.stringify({ acik, adresler }) }),
   gostergeler: () => istek<Gostergeler>('/api/gostergeler'),
   mesajlar: () => istek<Mesaj[]>('/api/mesajlar'),
   okunmamisMesaj: () => istek<{ sayi: number }>('/api/mesajlar/okunmamis'),
@@ -316,3 +322,19 @@ export type Gostergeler = {
 }
 
 export type Mesaj = { id: number; tarih: string; kimden: string | null; baslik: string | null; mesaj: string | null; okundu: boolean }
+
+export type AlarmTanimi = {
+  kod: string; baslik: string; durumlar: { deger: string; ad: string }[]
+  sayi1: string | null; sayi1Min: number; sayi2: string | null; saat: boolean; bolge: boolean; rota: boolean
+}
+export type AlarmAyari = {
+  kod: string; durum: number; sayi1: number | null; sayi2: number | null; bas: string | null; bit: string | null
+  rota: number | null; bolgeler: number[] | null; eposta: boolean; sms: boolean
+}
+export type BildirimTanimlari = {
+  alarmlar: AlarmTanimi[]
+  eposta: { acik: boolean; adresler: string[] }
+  sms: { acik: boolean; adresler: string[] }
+  bolgeler: { id: number; ad: string }[]
+  rotalar: { id: number; ad: string }[]
+}
